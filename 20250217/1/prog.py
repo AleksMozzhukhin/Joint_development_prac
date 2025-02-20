@@ -16,10 +16,6 @@ def list_branches(git_dir):
 
 
 def read_object(repo, obj_hash):
-    """
-    Читает объект по его хешу из .git/objects.
-    Возвращает кортеж: (тип объекта, содержимое объекта (bytes))
-    """
     path = os.path.join(repo, ".git", "objects", obj_hash[:2], obj_hash[2:])
     try:
         with open(path, "rb") as f:

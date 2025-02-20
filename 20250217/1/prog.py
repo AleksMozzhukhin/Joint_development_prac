@@ -69,22 +69,12 @@ def print_commit(commit_data):
     print(commit_data.get("message", ""))
 
 def parse_tree(content):
-    """
-    Парсит бинарное содержимое tree-объекта и возвращает список записей.
-    Каждая запись – словарь с ключами:
-      - mode: строка с правами доступа
-      - type: "blob" или "tree" (если mode == "40000" → tree, иначе blob)
-      - filename: имя файла/папки
-      - hash: хеш объекта в шестнадцатеричном виде
-    """
     entries = []
     i = 0
     while i < len(content):
-        # Читаем mode до пробела
         j = content.find(b' ', i)
         mode = content[i:j].decode()
         i = j + 1
-        # Читаем имя файла до нулевого байта
         j = content.find(b'\x00', i)
         filename = content[i:j].decode()
         i = j + 1
@@ -102,9 +92,31 @@ def parse_tree(content):
     return entries
 
 def print_tree(entries):
-    """Выводит дерево в формате: <type> <hash>    <filename>"""
     for entry in entries:
         print(f"{entry['type']} {entry['hash']}    {entry['filename']}")
+
+
+def traverse_history(repo, initial_commit_hash):
+    commit_hash = initial_commit_hash
+    while commit_hash:
+        obj_type, commit_content = read_object(repo, commit_hash)
+        if obj_type != "commit":
+            sys.exit(f"Объект {commit_hash} не является commit-объектом.")
+        commit_data = parse_commit(commit_content)
+
+        tree_hash = commit_data.get("tree")
+        if not tree_hash:
+            sys.exit(f"В коммите {commit_hash} отсутствует ссылка на дерево.")
+        obj_type, tree_content = read_object(repo, tree_hash)
+        if obj_type != "tree":
+            sys.exit(f"Объект {tree_hash} не является tree-объектом.")
+        entries = parse_tree(tree_content)
+        print(f"TREE for commit {commit_hash}")
+        print_tree(entries)
+
+        parents = commit_data.get("parents", [])
+        commit_hash = parents[0] if parents else None
+
 
 if len(sys.argv) < 2:
     sys.exit(1)
@@ -137,4 +149,5 @@ if obj_type != "tree":
     sys.exit("Объект не является tree-объектом.")
 entries = parse_tree(tree_content)
 print_tree(entries)
-print()
+print('#######################################################################')
+traverse_history(repo_path, commit_hash)

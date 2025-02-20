@@ -2,7 +2,7 @@ import os
 import sys
 import zlib
 import re
-
+import binascii
 
 def list_branches(git_dir):
     refs_heads = os.path.join(git_dir, "refs", "heads")
@@ -68,6 +68,43 @@ def print_commit(commit_data):
     print()
     print(commit_data.get("message", ""))
 
+def parse_tree(content):
+    """
+    Парсит бинарное содержимое tree-объекта и возвращает список записей.
+    Каждая запись – словарь с ключами:
+      - mode: строка с правами доступа
+      - type: "blob" или "tree" (если mode == "40000" → tree, иначе blob)
+      - filename: имя файла/папки
+      - hash: хеш объекта в шестнадцатеричном виде
+    """
+    entries = []
+    i = 0
+    while i < len(content):
+        # Читаем mode до пробела
+        j = content.find(b' ', i)
+        mode = content[i:j].decode()
+        i = j + 1
+        # Читаем имя файла до нулевого байта
+        j = content.find(b'\x00', i)
+        filename = content[i:j].decode()
+        i = j + 1
+        # Следующие 20 байт – бинарный SHA1
+        sha = content[i:i+20]
+        hex_sha = binascii.hexlify(sha).decode()
+        i += 20
+        typ = "tree" if mode == "40000" else "blob"
+        entries.append({
+            "mode": mode,
+            "type": typ,
+            "filename": filename,
+            "hash": hex_sha
+        })
+    return entries
+
+def print_tree(entries):
+    """Выводит дерево в формате: <type> <hash>    <filename>"""
+    for entry in entries:
+        print(f"{entry['type']} {entry['hash']}    {entry['filename']}")
 
 if len(sys.argv) < 2:
     sys.exit(1)
@@ -91,3 +128,13 @@ if obj_type != "commit":
     sys.exit("Объект по ссылке не является commit-объектом.")
 commit_data = parse_commit(commit_content)
 print_commit(commit_data)
+print('########################################################################')
+tree_hash = commit_data.get("tree")
+if not tree_hash:
+    sys.exit("В коммите отсутствует ссылка на дерево.")
+obj_type, tree_content = read_object(repo_path, tree_hash)
+if obj_type != "tree":
+    sys.exit("Объект не является tree-объектом.")
+entries = parse_tree(tree_content)
+print_tree(entries)
+print()

@@ -71,8 +71,8 @@ class MUD:
 
     def encounter(self, x, y):
         if (x, y) in self.monsters:
-            monster_hello = self.monsters[(x, y)]
-            print(cowsay.cowsay(monster_hello))
+            monster_name, monster_hello = self.monsters[(x, y)]
+            print(cowsay.cowsay(monster_hello, cow=monster_name))
 
 
 game = MUD()

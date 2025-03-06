@@ -1,6 +1,6 @@
 import sys
 import cowsay
-
+import shlex
 
 class MUD:
     def __init__(self):
@@ -13,24 +13,21 @@ class MUD:
         if not command:
             return
 
-        parts = command.strip().split()
+        try:
+            parts = shlex.split(command.strip())
+        except ValueError:
+            print("Invalid command syntax")
+            return
+
+        if not parts:
+            return
+
         cmd = parts[0].lower()
 
         if cmd in ["up", "down", "left", "right"]:
             self.move_player(cmd)
         elif cmd == "addmon":
-            if len(parts) < 5:
-                print("Invalid arguments")
-                return
-
-            try:
-                name = parts[1]
-                x = int(parts[2])
-                y = int(parts[3])
-                hello = parts[4]
-                self.add_monster(name, x, y, hello)
-            except ValueError:
-                print("Invalid arguments")
+            self.process_addmon(parts[1:])
         else:
             print("Invalid command")
 

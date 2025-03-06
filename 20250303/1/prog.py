@@ -79,7 +79,7 @@ class MUD:
             else:
                 print(cowsay.cowsay(monster_hello, cow=monster_name))
 
-
+print("<<< Welcome to Python-MUD 0.1 >>>")
 game = MUD()
 
 if not sys.stdin.isatty():

@@ -57,7 +57,7 @@ class MUD:
             print("Invalid arguments")
             return
 
-        if name not in cowsay.list_cows():
+        if name not in cowsay.list_cows() and name != "jgsbat":
             print("Cannot add unknown monster")
             return
 
@@ -72,7 +72,12 @@ class MUD:
     def encounter(self, x, y):
         if (x, y) in self.monsters:
             monster_name, monster_hello = self.monsters[(x, y)]
-            print(cowsay.cowsay(monster_hello, cow=monster_name))
+            if monster_name == "jgsbat":
+                with open("jgsbat.cow", "r") as f:
+                    cow = cowsay.read_dot_cow(f)
+                print(cowsay.cowsay(monster_hello, cow=cow))
+            else:
+                print(cowsay.cowsay(monster_hello, cow=monster_name))
 
 
 game = MUD()

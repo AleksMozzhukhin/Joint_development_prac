@@ -2,6 +2,7 @@ import sys
 import cowsay
 import shlex
 
+
 class MUD:
     def __init__(self):
         self.grid_size = 10
@@ -31,6 +32,53 @@ class MUD:
         else:
             print("Invalid command")
 
+    def process_addmon(self, args):
+        if len(args) < 7:
+            print("Invalid arguments")
+            return
+
+        try:
+            monster_name = args[0]
+
+            hello_string = None
+            hitpoints = None
+            x = None
+            y = None
+
+            i = 1
+            while i < len(args):
+                param_name = args[i].lower()
+
+                if param_name == "hello" and i + 1 < len(args):
+                    hello_string = args[i + 1]
+                    i += 2
+                elif param_name == "hp" and i + 1 < len(args):
+                    hitpoints = int(args[i + 1])
+                    if hitpoints <= 0:
+                        print("Invalid arguments: hitpoints must be positive")
+                        return
+                    i += 2
+                elif param_name == "coords" and i + 2 < len(args):
+                    x = int(args[i + 1])
+                    y = int(args[i + 2])
+                    i += 3
+                else:
+                    print("Invalid arguments")
+                    return
+
+            if hello_string is None or hitpoints is None or x is None or y is None:
+                print("Invalid arguments: missing required parameters")
+                return
+
+            self.add_monster(monster_name, x, y, hello_string, hitpoints)
+
+        except ValueError:
+            print("Invalid arguments")
+            return
+        except IndexError:
+            print("Invalid arguments")
+            return
+
     def move_player(self, direction):
         if direction == "up":
             self.player_y = (self.player_y - 1) % self.grid_size
@@ -49,7 +97,7 @@ class MUD:
         if (self.player_x, self.player_y) in self.monsters:
             self.encounter(self.player_x, self.player_y)
 
-    def add_monster(self, name, x, y, hello):
+    def add_monster(self, name, x, y, hello, hitpoints):
         if not (0 <= x < self.grid_size and 0 <= y < self.grid_size):
             print("Invalid arguments")
             return
@@ -64,7 +112,7 @@ class MUD:
         else:
             print(f"Added monster {name} to ({x}, {y}) saying {hello}")
 
-        self.monsters[(x, y)] = (name, hello)
+        self.monsters[(x, y)] = (name, hello, hitpoints)
 
     def encounter(self, x, y):
         if (x, y) in self.monsters:

@@ -71,7 +71,7 @@ class MUD:
 
     def encounter(self, x, y):
         if (x, y) in self.monsters:
-            monster_name, monster_hello = self.monsters[(x, y)]
+            monster_name, monster_hello, _ = self.monsters[(x, y)]
             if monster_name == "jgsbat":
                 with open("jgsbat.cow", "r") as f:
                     cow = cowsay.read_dot_cow(f)

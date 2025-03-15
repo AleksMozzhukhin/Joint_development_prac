@@ -1,14 +1,41 @@
 import sys
 import cowsay
 import shlex
+import cmd
 
-
-class MUD:
+class MUD(cmd.Cmd):
+    prompt = "> "
+    intro = "<<< Welcome to Python-MUD 0.1 >>>"
     def __init__(self):
+        super().__init__()
         self.grid_size = 10
         self.player_x = 0
         self.player_y = 0
         self.monsters = {}
+
+    def do_up(self, arg):
+        """Move player up one position"""
+        self.move_player("up")
+
+    def do_down(self, arg):
+        """Move player down one position"""
+        self.move_player("down")
+
+    def do_left(self, arg):
+        """Move player left one position"""
+        self.move_player("left")
+
+    def do_right(self, arg):
+        """Move player right one position"""
+        self.move_player("right")
+
+    def do_addmon(self, arg):
+        """Add monster to the map: addmon name hello "message" hp health coords x y"""
+        try:
+            parts = shlex.split(arg)
+            self.process_addmon(parts)
+        except ValueError:
+            print("Invalid command syntax")
 
     def process_command(self, command):
         if not command:
@@ -124,16 +151,23 @@ class MUD:
             else:
                 print(cowsay.cowsay(monster_hello, cow=monster_name))
 
-print("<<< Welcome to Python-MUD 0.1 >>>")
-game = MUD()
+    def do_quit(self, arg):
+        """Exit the game"""
+        return True
 
-if not sys.stdin.isatty():
-    for line in sys.stdin:
-        game.process_command(line)
-else:
-    while True:
-        try:
-            command = input("> ")
-            game.process_command(command)
-        except (KeyboardInterrupt, EOFError):
-            break
+    def do_exit(self, arg):
+        """Exit the game"""
+        return True
+
+def main():
+    MUD().cmdloop()
+
+    # if not sys.stdin.isatty():
+    #     for line in sys.stdin:
+    #         game.onecmd(line)
+    # else:
+    #     game.cmdloop()
+
+
+if __name__ == "__main__":
+    main()

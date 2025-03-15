@@ -37,6 +37,29 @@ class MUD(cmd.Cmd):
         except ValueError:
             print("Invalid command syntax")
 
+    def do_attack(self, *args):
+        """Attack a monster at the current position"""
+        if (self.player_x, self.player_y) not in self.monsters:
+            print("No monster here")
+            return
+        else:
+            self.process_attack()
+
+    def process_attack(self):
+        monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+        damage = min(10, monster_hp)
+
+        print(f"Attacked {monster_name}, damage {damage} hp")
+
+        monster_hp -= damage
+
+        if monster_hp == 0:
+            print(f"{monster_name} died")
+            del self.monsters[(self.player_x, self.player_y)]
+        else:
+            print(f"{monster_name} now has {monster_hp}")
+            self.monsters[(self.player_x, self.player_y)] = (monster_name, monster_hello, monster_hp)
+
     def process_command(self, command):
         if not command:
             return

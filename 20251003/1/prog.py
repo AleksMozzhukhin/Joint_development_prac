@@ -45,7 +45,7 @@ class MUD(cmd.Cmd):
             print("Invalid command syntax")
 
     def do_attack(self, arg):
-        """Attack a monster at the current position with weapon: attack with <weapon>"""
+        """Attack a monster at the current position with weapon: attack <monster_name> with <weapon>"""
         if (self.player_x, self.player_y) not in self.monsters:
             print("No monster here")
             return
@@ -55,36 +55,66 @@ class MUD(cmd.Cmd):
     def process_attack(self, arg):
         args = shlex.split(arg) if arg else []
         weapon = "sword"
+        monster_name_arg = None
 
-        if len(args) >= 2 and args[0].lower() == "with":
-            weapon = args[1].lower()
-            if weapon not in self.weapons:
-                print("Unknown weapon")
-                return
+        i = 0
+        while i < len(args):
+            if args[i].lower() == "with" and i + 1 < len(args):
+                weapon = args[i + 1].lower()
+                i += 2
+            else:
+                monster_name_arg = args[i]
+                i += 1
 
-        monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+        if weapon not in self.weapons:
+            print("Unknown weapon")
+            return
+
+        current_monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+
+        if monster_name_arg and monster_name_arg != current_monster_name:
+            print(f"No {monster_name_arg} here")
+            return
+
         damage = min(self.weapons[weapon], monster_hp)
 
-        print(f"Attacked {monster_name}, damage {damage} hp")
+        print(f"Attacked {current_monster_name}, damage {damage} hp")
 
         monster_hp -= damage
 
         if monster_hp == 0:
-            print(f"{monster_name} died")
+            print(f"{current_monster_name} died")
             del self.monsters[(self.player_x, self.player_y)]
         else:
-            print(f"{monster_name} now has {monster_hp}")
-            self.monsters[(self.player_x, self.player_y)] = (monster_name, monster_hello, monster_hp)
+            print(f"{current_monster_name} now has {monster_hp}")
+            self.monsters[(self.player_x, self.player_y)] = (current_monster_name, monster_hello, monster_hp)
 
     def complete_attack(self, text, line, begidx, endidx):
-        """Auto-complete for attack command"""
-        line_parts = line[:begidx].split()
+        """Auto-complete для команды attack"""
+        args = shlex.split(line[:begidx]) if line[:begidx].strip() else []
 
-        if len(line_parts) == 1:
+        available_monsters = cowsay.list_cows()
+        if "jgsbat" not in available_monsters:
+            available_monsters.append("jgsbat")
+
+        if (self.player_x, self.player_y) in self.monsters:
+            current_monster = self.monsters[(self.player_x, self.player_y)][0]
+            if current_monster not in available_monsters:
+                available_monsters.append(current_monster)
+
+        if len(args) <= 1:
+            if not text or "with".startswith(text):
+                return ["with"] + [monster for monster in available_monsters if monster.startswith(text)]
+            return [monster for monster in available_monsters if monster.startswith(text)]
+
+        if len(args) == 2 and args[1] == "with":
+            return [weapon for weapon in self.weapons if weapon.startswith(text)]
+
+        if len(args) == 2 and args[1] in available_monsters:
             return ["with"] if not text or "with".startswith(text) else []
 
-        if len(line_parts) == 2 and line_parts[1] == "with":
-            return [weapon for weapon in self.weapons if not text or weapon.startswith(text)]
+        if len(args) >= 3 and args[1] in available_monsters and args[2] == "with":
+            return [weapon for weapon in self.weapons if weapon.startswith(text)]
 
         return []
 

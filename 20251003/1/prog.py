@@ -3,9 +3,11 @@ import cowsay
 import shlex
 import cmd
 
+
 class MUD(cmd.Cmd):
     prompt = "> "
     intro = "<<< Welcome to Python-MUD 0.1 >>>"
+
     def __init__(self):
         super().__init__()
         self.grid_size = 10
@@ -37,28 +39,52 @@ class MUD(cmd.Cmd):
         except ValueError:
             print("Invalid command syntax")
 
-    def do_attack(self, *args):
+    def do_attack(self, arg):
         """Attack a monster at the current position"""
         if (self.player_x, self.player_y) not in self.monsters:
             print("No monster here")
             return
         else:
-            self.process_attack()
+            self.process_attack(arg)
 
-    def process_attack(self):
-        monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+    def process_attack(self, arg):
+        args = shlex.split(arg) if arg else []
+
+        if args:
+            monster_name_arg = args[0]
+            current_monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+
+            if monster_name_arg != current_monster_name:
+                print(f"No {monster_name_arg} here")
+                return
+        else:
+            current_monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
+
         damage = min(10, monster_hp)
 
-        print(f"Attacked {monster_name}, damage {damage} hp")
+        print(f"Attacked {current_monster_name}, damage {damage} hp")
 
         monster_hp -= damage
 
         if monster_hp == 0:
-            print(f"{monster_name} died")
+            print(f"{current_monster_name} died")
             del self.monsters[(self.player_x, self.player_y)]
         else:
-            print(f"{monster_name} now has {monster_hp}")
-            self.monsters[(self.player_x, self.player_y)] = (monster_name, monster_hello, monster_hp)
+            print(f"{current_monster_name} now has {monster_hp}")
+            self.monsters[(self.player_x, self.player_y)] = (current_monster_name, monster_hello, monster_hp)
+
+    def complete_attack(self, text, line, begidx, endidx):
+        """Auto-complete for attack command using available monster names"""
+        available_monsters = cowsay.list_cows()
+        if "jgsbat" not in available_monsters:
+            available_monsters.append("jgsbat")
+
+        if (self.player_x, self.player_y) in self.monsters:
+            current_monster = self.monsters[(self.player_x, self.player_y)][0]
+            if current_monster not in available_monsters:
+                available_monsters.append(current_monster)
+
+        return [monster for monster in available_monsters if monster.startswith(text)]
 
     def process_command(self, command):
         if not command:
@@ -182,14 +208,9 @@ class MUD(cmd.Cmd):
         """Exit the game"""
         return True
 
+
 def main():
     MUD().cmdloop()
-
-    # if not sys.stdin.isatty():
-    #     for line in sys.stdin:
-    #         game.onecmd(line)
-    # else:
-    #     game.cmdloop()
 
 
 if __name__ == "__main__":

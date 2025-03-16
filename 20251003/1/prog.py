@@ -3,15 +3,22 @@ import cowsay
 import shlex
 import cmd
 
+
 class MUD(cmd.Cmd):
     prompt = "> "
     intro = "<<< Welcome to Python-MUD 0.1 >>>"
+
     def __init__(self):
         super().__init__()
         self.grid_size = 10
         self.player_x = 0
         self.player_y = 0
         self.monsters = {}
+        self.weapons = {
+            "sword": 10,
+            "spear": 15,
+            "axe": 20
+        }
 
     def do_up(self, arg):
         """Move player up one position"""
@@ -30,24 +37,33 @@ class MUD(cmd.Cmd):
         self.move_player("right")
 
     def do_addmon(self, arg):
-        """Add monster to the map: addmon name hello "message" hp health coords x y"""
+        """Add monster to the map: addmon name hp health coords x y hello "message" """
         try:
             parts = shlex.split(arg)
             self.process_addmon(parts)
         except ValueError:
             print("Invalid command syntax")
 
-    def do_attack(self, *args):
-        """Attack a monster at the current position"""
+    def do_attack(self, arg):
+        """Attack a monster at the current position with weapon: attack with <weapon>"""
         if (self.player_x, self.player_y) not in self.monsters:
             print("No monster here")
             return
         else:
-            self.process_attack()
+            self.process_attack(arg)
 
-    def process_attack(self):
+    def process_attack(self, arg):
+        args = shlex.split(arg) if arg else []
+        weapon = "sword"
+
+        if len(args) >= 2 and args[0].lower() == "with":
+            weapon = args[1].lower()
+            if weapon not in self.weapons:
+                print("Unknown weapon")
+                return
+
         monster_name, monster_hello, monster_hp = self.monsters[(self.player_x, self.player_y)]
-        damage = min(10, monster_hp)
+        damage = min(self.weapons[weapon], monster_hp)
 
         print(f"Attacked {monster_name}, damage {damage} hp")
 
@@ -59,6 +75,18 @@ class MUD(cmd.Cmd):
         else:
             print(f"{monster_name} now has {monster_hp}")
             self.monsters[(self.player_x, self.player_y)] = (monster_name, monster_hello, monster_hp)
+
+    def complete_attack(self, text, line, begidx, endidx):
+        """Auto-complete for attack command"""
+        line_parts = line[:begidx].split()
+
+        if len(line_parts) == 1:
+            return ["with"] if not text or "with".startswith(text) else []
+
+        if len(line_parts) == 2 and line_parts[1] == "with":
+            return [weapon for weapon in self.weapons if not text or weapon.startswith(text)]
+
+        return []
 
     def process_command(self, command):
         if not command:
@@ -182,14 +210,9 @@ class MUD(cmd.Cmd):
         """Exit the game"""
         return True
 
+
 def main():
     MUD().cmdloop()
-
-    # if not sys.stdin.isatty():
-    #     for line in sys.stdin:
-    #         game.onecmd(line)
-    # else:
-    #     game.cmdloop()
 
 
 if __name__ == "__main__":

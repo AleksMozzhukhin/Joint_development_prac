@@ -1,0 +1,237 @@
+From db79a7bcc5bb4ff88430c36ca205b9c669cdadcc Mon Sep 17 00:00:00 2001
+From: Aleks_mozz laptop WSL <s02220179@gse.cs.msu.ru>
+Date: Sat, 22 Mar 2025 16:27:59 +0300
+Subject: [PATCH 3/3] <HW 05_GitPatch> finalizing client part
+
+---
+ 20251703/1/client.py | 207 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 207 insertions(+)
+
+diff --git a/20251703/1/client.py b/20251703/1/client.py
+index a37befb..0b0af19 100644
+--- a/20251703/1/client.py
++++ b/20251703/1/client.py
+@@ -19,6 +19,8 @@ class MUDClient(cmd.Cmd):
+         # Подключаемся к серверу
+         self.connect()
+ 
++        # Получаем доступное оружие
++        self.get_weapons()
+ 
+     def connect(self):
+         """Подключение к серверу"""
+@@ -30,6 +32,211 @@ class MUDClient(cmd.Cmd):
+             print(f"Failed to connect to server: {e}")
+             sys.exit(1)
+ 
++    def get_weapons(self):
++        """Получаем список оружия от сервера"""
++        response = self.send_command("get_weapons")
++        parts = response.split(" ")
++        if parts[0] == "WEAPONS:":
++            i = 1
++            while i < len(parts):
++                if i + 1 < len(parts):
++                    self.weapons[parts[i]] = int(parts[i + 1])
++                i += 2
++
++    def send_command(self, command):
++        """Отправка команды на сервер и получение ответа"""
++        try:
++            self.socket.sendall(f"{command}\n".encode())
++            response = self.socket.recv(1024).decode().strip()
++            return response
++        except Exception as e:
++            print(f"Error communicating with server: {e}")
++            return "ERROR: Connection failed"
++
++    def do_up(self, arg):
++        """Move player up one position"""
++        response = self.send_command("move 0 -1")
++        self.handle_server_response(response)
++
++    def do_down(self, arg):
++        """Move player down one position"""
++        response = self.send_command("move 0 1")
++        self.handle_server_response(response)
++
++    def do_left(self, arg):
++        """Move player left one position"""
++        response = self.send_command("move -1 0")
++        self.handle_server_response(response)
++
++    def do_right(self, arg):
++        """Move player right one position"""
++        response = self.send_command("move 1 0")
++        self.handle_server_response(response)
++
++    def do_addmon(self, arg):
++        """Add monster to the map: addmon name coords x y hp health hello "message" """
++        try:
++            parts = shlex.split(arg)
++            self.process_addmon(parts)
++        except ValueError:
++            print("Invalid command syntax")
++
++    def process_addmon(self, args):
++        if len(args) < 7:
++            print("Invalid arguments")
++            return
++
++        try:
++            monster_name = args[0]
++
++            hello_string = None
++            hitpoints = None
++            x = None
++            y = None
++
++            i = 1
++            while i < len(args):
++                param_name = args[i].lower()
++
++                if param_name == "hello" and i + 1 < len(args):
++                    hello_string = args[i + 1]
++                    i += 2
++                elif param_name == "hp" and i + 1 < len(args):
++                    hitpoints = int(args[i + 1])
++                    if hitpoints <= 0:
++                        print("Invalid arguments: hitpoints must be positive")
++                        return
++                    i += 2
++                elif param_name == "coords" and i + 2 < len(args):
++                    x = int(args[i + 1])
++                    y = int(args[i + 2])
++                    i += 3
++                else:
++                    print("Invalid arguments")
++                    return
++
++            if hello_string is None or hitpoints is None or x is None or y is None:
++                print("Invalid arguments: missing required parameters")
++                return
++
++            # Отправляем команду на сервер в упрощенном формате
++            command = f'addmon {monster_name} {x} {y} "{hello_string}" {hitpoints}'
++            response = self.send_command(command)
++            self.handle_server_response(response)
++
++        except ValueError:
++            print("Invalid arguments")
++            return
++        except IndexError:
++            print("Invalid arguments")
++            return
++
++    def do_attack(self, arg):
++        """Attack a monster at the current position with weapon: attack <monster_name> with <weapon>"""
++        args = shlex.split(arg) if arg else []
++        weapon = "sword"  # Оружие по умолчанию
++        monster_name = None
++
++        i = 0
++        while i < len(args):
++            if args[i].lower() == "with" and i + 1 < len(args):
++                weapon = args[i + 1].lower()
++                i += 2
++            else:
++                monster_name = args[i]
++                i += 1
++
++        if not monster_name:
++            print("Monster name not specified")
++            return
++
++        if weapon not in self.weapons:
++            print("Unknown weapon")
++            return
++
++        # Отправляем команду на сервер
++        damage = self.weapons[weapon]
++        response = self.send_command(f"attack {monster_name} {damage}")
++        self.handle_server_response(response)
++
++    def complete_attack(self, text, line, begidx, endidx):
++        """Auto-complete для команды attack"""
++        args = shlex.split(line[:begidx]) if line[:begidx].strip() else []
++
++        available_monsters = cowsay.list_cows()
++        if "jgsbat" not in available_monsters:
++            available_monsters.append("jgsbat")
++
++        if len(args) <= 1:
++            if not text or "with".startswith(text):
++                return ["with"] + [monster for monster in available_monsters if monster.startswith(text)]
++            return [monster for monster in available_monsters if monster.startswith(text)]
++
++        if len(args) == 2 and args[1] == "with":
++            return [weapon for weapon in self.weapons if weapon.startswith(text)]
++
++        if len(args) == 2 and args[1] in available_monsters:
++            return ["with"] if not text or "with".startswith(text) else []
++
++        if len(args) >= 3 and args[1] in available_monsters and args[2] == "with":
++            return [weapon for weapon in self.weapons if weapon.startswith(text)]
++
++        return []
++
++    def handle_server_response(self, response):
++        """Обрабатывает ответ от сервера и выводит информацию пользователю"""
++        lines = response.strip().split("\n")
++
++        for line in lines:
++            parts = line.split(" ", 1)
++            if len(parts) < 2:
++                continue
++
++            cmd = parts[0]
++            args = parts[1] if len(parts) > 1 else ""
++
++            if cmd == "MOVED:":
++                coords = args.split()
++                if len(coords) == 2:
++                    print(f"Moved to ({coords[0]}, {coords[1]})")
++            elif cmd == "ENCOUNTER:":
++                enc_parts = args.split(" ", 1)
++                if len(enc_parts) == 2:
++                    monster_name = enc_parts[0]
++                    message = enc_parts[1]
++                    self.display_monster(monster_name, message)
++            elif cmd == "ADDED:":
++                print(args)
++            elif cmd == "ATTACK:":
++                attack_parts = args.split()
++                if len(attack_parts) >= 3:
++                    monster_name = attack_parts[0]
++                    damage = attack_parts[1]
++                    hp_left = attack_parts[2]
++
++                    print(f"Attacked {monster_name}, damage {damage} hp")
++
++                    if "KILLED" in args:
++                        print(f"{monster_name} died")
++                    else:
++                        print(f"{monster_name} now has {hp_left}")
++            elif cmd == "ERROR:":
++                print(args)
++
++    def display_monster(self, monster_name, message):
++        """Отображает монстра с использованием cowsay"""
++        if monster_name == "jgsbat":
++            try:
++                with open("jgsbat.cow", "r") as f:
++                    cow = cowsay.read_dot_cow(f)
++                print(cowsay.cowsay(message, cow=cow))
++            except FileNotFoundError:
++                print(f"Monster {monster_name} says: {message}")
++        else:
++            try:
++                print(cowsay.cowsay(message, cow=monster_name))
++            except Exception:
++                print(f"Monster {monster_name} says: {message}")
+ 
+     def do_quit(self, arg):
+         """Exit the game"""
+-- 
+2.43.0
+

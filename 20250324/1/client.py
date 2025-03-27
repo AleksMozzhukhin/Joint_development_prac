@@ -18,12 +18,10 @@ class MUDClient(cmd.Cmd):
         self.socket = None
         self.weapons = {}
         self.username = username or "Unknown"
-        self.running = True  # Флаг для контроля потока приема
+        self.running = True
 
-        # Подключаемся к серверу
         self.connect()
 
-        # Запускаем поток для приема сообщений
         self.receiver_thread = threading.Thread(target=self.receive_messages)
         self.receiver_thread.daemon = True
         self.receiver_thread.start()
@@ -34,7 +32,6 @@ class MUDClient(cmd.Cmd):
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
             print(f"Connected to server at {self.host}:{self.port}")
-            # Отправляем имя пользователя и ждем ответа сразу (синхронно)
             self.socket.sendall(f"login {self.username}\n".encode())
             response = self.socket.recv(1024).decode().strip()
 
@@ -45,7 +42,6 @@ class MUDClient(cmd.Cmd):
             else:
                 print(f"Logged in as {self.username}")
 
-            # Запрашиваем оружие асинхронно - будет обработано в receive_messages
             self.send_command("get_weapons")
         except Exception as e:
             print(f"Failed to connect to server: {e}")
@@ -61,18 +57,13 @@ class MUDClient(cmd.Cmd):
 
                 message = data.decode().strip()
 
-                # Обработка сообщения о оружии
                 if "WEAPONS:" in message:
-                    # Выделяем информацию об оружии
                     parts = message.split("WEAPONS: ")[1].split()
                     i = 0
                     while i < len(parts):
                         if i + 1 < len(parts):
                             self.weapons[parts[i]] = int(parts[i + 1])
                         i += 2
-                    print(
-                        f"\nWeapons loaded: {', '.join(self.weapons.keys())}\n{self.prompt}{readline.get_line_buffer()}",
-                        end="", flush=True)
                     continue
 
                 if "ENCOUNTER:" in message:
@@ -83,11 +74,9 @@ class MUDClient(cmd.Cmd):
                             monster_name = encounter_parts[0]
                             monster_message = encounter_parts[1].strip("'")
 
-                            # Выводим сообщение с cowsay
                             self.display_monster(monster_name, monster_message)
-                            continue  # Не выводим исходное сообщение
+                            continue
 
-                # Выводим сообщение с восстановлением командной строки
                 print(f"\n{message}\n{self.prompt}{readline.get_line_buffer()}", end="", flush=True)
 
         except Exception as e:

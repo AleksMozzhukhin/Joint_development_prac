@@ -3,6 +3,8 @@ import shlex
 import socket
 import cowsay
 import sys
+import readline
+import threading
 
 
 class MUDClient(cmd.Cmd):
@@ -16,12 +18,15 @@ class MUDClient(cmd.Cmd):
         self.socket = None
         self.weapons = {}
         self.username = username or "Unknown"
+        self.running = True  # Флаг для контроля потока приема
 
         # Подключаемся к серверу
         self.connect()
 
-        # Получаем доступное оружие
-        self.get_weapons()
+        # Запускаем поток для приема сообщений
+        self.receiver_thread = threading.Thread(target=self.receive_messages)
+        self.receiver_thread.daemon = True
+        self.receiver_thread.start()
 
     def connect(self):
         """Подключение к серверу"""
@@ -29,8 +34,7 @@ class MUDClient(cmd.Cmd):
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
             print(f"Connected to server at {self.host}:{self.port}")
-
-            # Отправляем имя пользователя
+            # Отправляем имя пользователя и ждем ответа сразу (синхронно)
             self.socket.sendall(f"login {self.username}\n".encode())
             response = self.socket.recv(1024).decode().strip()
 
@@ -41,20 +45,57 @@ class MUDClient(cmd.Cmd):
             else:
                 print(f"Logged in as {self.username}")
 
-            # Запрашиваем оружие после успешного логина
-            self.socket.sendall("get_weapons\n".encode())
-            response = self.socket.recv(1024).decode().strip()
-
-            parts = response.split(" ")
-            if parts[0] == "WEAPONS:":
-                i = 1
-                while i < len(parts):
-                    if i + 1 < len(parts):
-                        self.weapons[parts[i]] = int(parts[i + 1])
-                    i += 2
+            # Запрашиваем оружие асинхронно - будет обработано в receive_messages
+            self.send_command("get_weapons")
         except Exception as e:
             print(f"Failed to connect to server: {e}")
             sys.exit(1)
+
+    def receive_messages(self):
+        """Асинхронное получение сообщений от сервера"""
+        try:
+            while self.running and self.socket:
+                data = self.socket.recv(1024)
+                if not data:
+                    break
+
+                message = data.decode().strip()
+
+                # Обработка сообщения о оружии
+                if "WEAPONS:" in message:
+                    # Выделяем информацию об оружии
+                    parts = message.split("WEAPONS: ")[1].split()
+                    i = 0
+                    while i < len(parts):
+                        if i + 1 < len(parts):
+                            self.weapons[parts[i]] = int(parts[i + 1])
+                        i += 2
+                    print(
+                        f"\nWeapons loaded: {', '.join(self.weapons.keys())}\n{self.prompt}{readline.get_line_buffer()}",
+                        end="", flush=True)
+                    continue
+
+                if "ENCOUNTER:" in message:
+                    parts = message.split("ENCOUNTER: ")
+                    if len(parts) > 1:
+                        encounter_parts = parts[1].split(" ", 1)
+                        if len(encounter_parts) == 2:
+                            monster_name = encounter_parts[0]
+                            monster_message = encounter_parts[1].strip("'")
+
+                            # Выводим сообщение с cowsay
+                            self.display_monster(monster_name, monster_message)
+                            continue  # Не выводим исходное сообщение
+
+                # Выводим сообщение с восстановлением командной строки
+                print(f"\n{message}\n{self.prompt}{readline.get_line_buffer()}", end="", flush=True)
+
+        except Exception as e:
+            print(f"\nError receiving messages: {e}\n{self.prompt}", end="", flush=True)
+        finally:
+            if self.running:
+                print("\nConnection closed. Press Enter to exit.")
+                self.running = False
 
     def get_weapons(self):
         """Получаем список оружия от сервера"""

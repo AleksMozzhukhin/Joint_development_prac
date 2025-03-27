@@ -9,12 +9,13 @@ class MUDClient(cmd.Cmd):
     prompt = "> "
     intro = "<<< Welcome to Python-MUD Client 0.1 >>>"
 
-    def __init__(self, host='localhost', port=65432):
+    def __init__(self, host='localhost', port=65432, username=None):
         super().__init__()
         self.host = host
         self.port = port
         self.socket = None
         self.weapons = {}
+        self.username = username or "Unknown"
 
         # Подключаемся к серверу
         self.connect()
@@ -28,6 +29,29 @@ class MUDClient(cmd.Cmd):
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
             print(f"Connected to server at {self.host}:{self.port}")
+
+            # Отправляем имя пользователя
+            self.socket.sendall(f"login {self.username}\n".encode())
+            response = self.socket.recv(1024).decode().strip()
+
+            if response.startswith("ERROR:"):
+                print(response)
+                self.socket.close()
+                sys.exit(1)
+            else:
+                print(f"Logged in as {self.username}")
+
+            # Запрашиваем оружие после успешного логина
+            self.socket.sendall("get_weapons\n".encode())
+            response = self.socket.recv(1024).decode().strip()
+
+            parts = response.split(" ")
+            if parts[0] == "WEAPONS:":
+                i = 1
+                while i < len(parts):
+                    if i + 1 < len(parts):
+                        self.weapons[parts[i]] = int(parts[i + 1])
+                    i += 2
         except Exception as e:
             print(f"Failed to connect to server: {e}")
             sys.exit(1)
@@ -255,16 +279,24 @@ class MUDClient(cmd.Cmd):
 def main():
     host = 'localhost'
     port = 65432
+    username = None
 
-    # Проверяем аргументы командной строки для указания host:port
+    # Проверяем аргументы командной строки для указания username и host:port
     if len(sys.argv) > 1:
-        server_addr = sys.argv[1].split(':')
-        host = server_addr[0]
-        if len(server_addr) > 1:
-            port = int(server_addr[1])
+        # Формат: python mymud.py username [host:port]
+        username = sys.argv[1]
+        if len(sys.argv) > 2:
+            server_addr = sys.argv[2].split(':')
+            host = server_addr[0]
+            if len(server_addr) > 1:
+                port = int(server_addr[1])
+
+    if not username:
+        print("Username required: python mymud.py username [host:port]")
+        sys.exit(1)
 
     try:
-        MUDClient(host, port).cmdloop()
+        MUDClient(host, port, username).cmdloop()
     except KeyboardInterrupt:
         print("\nExiting game...")
 

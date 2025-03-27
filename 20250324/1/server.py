@@ -119,44 +119,80 @@ class MUDGame:
 
 # Глобальные игровые экземпляры для разных клиентов
 games = {}
+clients = {}  # соответствие writer -> username
+usernames = set()
 
 
 async def handle_client(reader, writer):
     client_addr = "{}:{}".format(*writer.get_extra_info('peername'))
-    print(f"Connected: {client_addr}")
-
-    # Создаем новый экземпляр игры для этого клиента
-    if client_addr not in games:
-        games[client_addr] = MUDGame()
-
-    game = games[client_addr]
+    print(f"Connection attempt: {client_addr}")
+    username = None
 
     try:
+        # Получаем имя пользователя
+        data = await reader.readline()
+        if not data:
+            writer.close()
+            return
+
+        message = data.decode().strip()
+        parts = shlex.split(message)
+
+        if len(parts) < 2 or parts[0].lower() != "login":
+            writer.write("ERROR: Invalid login format. Use 'login username'\n".encode())
+            await writer.drain()
+            writer.close()
+            return
+
+        username = parts[1]
+
+        # Проверка уникальности имени
+        if username in usernames:
+            writer.write(f"ERROR: Username '{username}' is already taken\n".encode())
+            await writer.drain()
+            writer.close()
+            return
+
+        # Сохраняем информацию о клиенте
+        usernames.add(username)
+        clients[writer] = username
+        games[username] = MUDGame()  # Создаем экземпляр игры для пользователя
+
+        writer.write(f"Welcome, {username}! You are now connected to the MUD.\n".encode())
+        await writer.drain()
+
+        print(f"User '{username}' connected from {client_addr}")
+
+        # Обработка остальных команд от клиента
         while not reader.at_eof():
             data = await reader.readline()
             if not data:
                 break
 
             message = data.decode().strip()
-            print(f"Received from {client_addr}: {message}")
+            print(f"Received from {username}: {message}")
 
             if message.lower() == "quit" or message.lower() == "exit":
                 break
 
-            response = game.handle_command(message)
+            response = games[username].handle_command(message)
             writer.write(f"{response}\n".encode())
             await writer.drain()
 
     except Exception as e:
         print(f"Error handling client {client_addr}: {e}")
     finally:
-        print(f"Client disconnected: {client_addr}")
+        if username and username in usernames:
+            print(f"User '{username}' disconnected")
+            usernames.remove(username)
+            if username in games:
+                del games[username]
+
+        if writer in clients:
+            del clients[writer]
+
         writer.close()
         await writer.wait_closed()
-
-        # Удаляем игру этого клиента при отключении
-        if client_addr in games:
-            del games[client_addr]
 
 
 async def main():

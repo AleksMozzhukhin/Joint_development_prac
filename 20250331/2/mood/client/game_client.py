@@ -1,3 +1,5 @@
+"""Модуль клиентской части игры MOOD."""
+
 import cmd
 import shlex
 import socket
@@ -5,13 +7,23 @@ import cowsay
 import sys
 import readline
 import threading
+from ..common import constants as const
 
 
 class MUDClient(cmd.Cmd):
-    prompt = "> "
-    intro = "<<< Welcome to Python-MUD Client 0.1 >>>"
+    """Класс клиента для игры MOOD."""
 
-    def __init__(self, host='localhost', port=65432, username=None):
+    prompt = "> "
+    intro = "<<< Welcome to MOOD (MUD with cowsay) Client 0.2.0 >>>"
+
+    def __init__(self, host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
+        """Инициализировать клиента.
+
+        Args:
+            host: Адрес сервера.
+            port: Порт сервера.
+            username: Имя пользователя.
+        """
         super().__init__()
         self.host = host
         self.port = port
@@ -27,28 +39,28 @@ class MUDClient(cmd.Cmd):
         self.receiver_thread.start()
 
     def connect(self):
-        """Подключение к серверу"""
+        """Подключиться к серверу."""
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
             print(f"Connected to server at {self.host}:{self.port}")
-            self.socket.sendall(f"login {self.username}\n".encode())
+            self.socket.sendall(f"{const.CMD_LOGIN} {self.username}\n".encode())
             response = self.socket.recv(1024).decode().strip()
 
-            if response.startswith("ERROR:"):
+            if response.startswith(f"{const.RESP_ERROR}:"):
                 print(response)
                 self.socket.close()
                 sys.exit(1)
             else:
                 print(f"Logged in as {self.username}")
 
-            self.send_command("get_weapons")
+            self.send_command(const.CMD_GET_WEAPONS)
         except Exception as e:
             print(f"Failed to connect to server: {e}")
             sys.exit(1)
 
     def receive_messages(self):
-        """Асинхронное получение сообщений от сервера"""
+        """Асинхронно получать сообщения от сервера."""
         try:
             while self.running and self.socket:
                 data = self.socket.recv(1024)
@@ -57,8 +69,8 @@ class MUDClient(cmd.Cmd):
 
                 message = data.decode().strip()
 
-                if "WEAPONS:" in message:
-                    parts = message.split("WEAPONS: ")[1].split()
+                if f"{const.RESP_WEAPONS}:" in message:
+                    parts = message.split(f"{const.RESP_WEAPONS}: ")[1].split()
                     i = 0
                     while i < len(parts):
                         if i + 1 < len(parts):
@@ -66,8 +78,8 @@ class MUDClient(cmd.Cmd):
                         i += 2
                     continue
 
-                if "ENCOUNTER:" in message:
-                    parts = message.split("ENCOUNTER: ")
+                if f"{const.RESP_ENCOUNTER}:" in message:
+                    parts = message.split(f"{const.RESP_ENCOUNTER}: ")
                     if len(parts) > 1:
                         encounter_parts = parts[1].split(" ", 1)
                         if len(encounter_parts) == 2:
@@ -87,10 +99,10 @@ class MUDClient(cmd.Cmd):
                 self.running = False
 
     def get_weapons(self):
-        """Получаем список оружия от сервера"""
-        response = self.send_command("get_weapons")
+        """Получить список оружия от сервера."""
+        response = self.send_command(const.CMD_GET_WEAPONS)
         parts = response.split(" ")
-        if parts[0] == "WEAPONS:":
+        if parts[0] == f"{const.RESP_WEAPONS}:":
             i = 1
             while i < len(parts):
                 if i + 1 < len(parts):
@@ -98,46 +110,77 @@ class MUDClient(cmd.Cmd):
                 i += 2
 
     def send_command(self, command):
-        """Отправка команды на сервер и получение ответа"""
+        """Отправить команду на сервер и получить ответ.
+
+        Args:
+            command: Команда для отправки.
+
+        Returns:
+            str: Ответ от сервера.
+        """
         try:
             self.socket.sendall(f"{command}\n".encode())
             response = self.socket.recv(1024).decode().strip()
             return response
         except Exception as e:
             print(f"Error communicating with server: {e}")
-            return "ERROR: Connection failed"
+            return f"{const.RESP_ERROR}: Connection failed"
 
     def do_up(self, arg):
-        """Move player up one position"""
-        response = self.send_command("move 0 -1")
+        """Переместить игрока вверх на одну позицию.
+
+        Args:
+            arg: Аргументы команды (не используются).
+        """
+        response = self.send_command(f"{const.CMD_MOVE} 0 -1")
         self.handle_server_response(response)
 
     def do_down(self, arg):
-        """Move player down one position"""
-        response = self.send_command("move 0 1")
+        """Переместить игрока вниз на одну позицию.
+
+        Args:
+            arg: Аргументы команды (не используются).
+        """
+        response = self.send_command(f"{const.CMD_MOVE} 0 1")
         self.handle_server_response(response)
 
     def do_left(self, arg):
-        """Move player left one position"""
-        response = self.send_command("move -1 0")
+        """Переместить игрока влево на одну позицию.
+
+        Args:
+            arg: Аргументы команды (не используются).
+        """
+        response = self.send_command(f"{const.CMD_MOVE} -1 0")
         self.handle_server_response(response)
 
     def do_right(self, arg):
-        """Move player right one position"""
-        response = self.send_command("move 1 0")
+        """Переместить игрока вправо на одну позицию.
+
+        Args:
+            arg: Аргументы команды (не используются).
+        """
+        response = self.send_command(f"{const.CMD_MOVE} 1 0")
         self.handle_server_response(response)
 
     def do_sayall(self, arg):
-        """Send a message to all players: sayall <message> or sayall "message with spaces" """
+        """Отправить сообщение всем игрокам.
+
+        Args:
+            arg: Текст сообщения.
+        """
         if not arg:
             print("Message cannot be empty")
             return
 
-        response = self.send_command(f"sayall {arg}")
+        response = self.send_command(f"{const.CMD_SAYALL} {arg}")
         self.handle_server_response(response)
 
     def do_addmon(self, arg):
-        """Add monster to the map: addmon name coords x y hp health hello "message" """
+        """Добавить монстра на карту.
+
+        Args:
+            arg: Аргументы в формате: name coords x y hp health hello "message".
+        """
         try:
             parts = shlex.split(arg)
             self.process_addmon(parts)
@@ -145,6 +188,11 @@ class MUDClient(cmd.Cmd):
             print("Invalid command syntax")
 
     def process_addmon(self, args):
+        """Обработать аргументы команды addmon.
+
+        Args:
+            args: Список аргументов.
+        """
         if len(args) < 7:
             print("Invalid arguments")
             return
@@ -183,7 +231,7 @@ class MUDClient(cmd.Cmd):
                 return
 
             # Отправляем команду на сервер в упрощенном формате
-            command = f'addmon {monster_name} {x} {y} "{hello_string}" {hitpoints}'
+            command = f'{const.CMD_ADDMON} {monster_name} {x} {y} "{hello_string}" {hitpoints}'
             response = self.send_command(command)
             self.handle_server_response(response)
 
@@ -195,7 +243,11 @@ class MUDClient(cmd.Cmd):
             return
 
     def do_attack(self, arg):
-        """Attack a monster at the current position with weapon: attack <monster_name> with <weapon>"""
+        """Атаковать монстра.
+
+        Args:
+            arg: Аргументы в формате: <monster_name> with <weapon>.
+        """
         args = shlex.split(arg) if arg else []
         weapon = "sword"  # Оружие по умолчанию
         monster_name = None
@@ -219,11 +271,21 @@ class MUDClient(cmd.Cmd):
 
         # Отправляем команду на сервер
         damage = self.weapons[weapon]
-        response = self.send_command(f"attack {monster_name} {damage}")
+        response = self.send_command(f"{const.CMD_ATTACK} {monster_name} {damage}")
         self.handle_server_response(response)
 
     def complete_attack(self, text, line, begidx, endidx):
-        """Auto-complete для команды attack"""
+        """Автодополнение для команды attack.
+
+        Args:
+            text: Текст для дополнения.
+            line: Полная строка.
+            begidx: Начальный индекс.
+            endidx: Конечный индекс.
+
+        Returns:
+            list: Список вариантов автодополнения.
+        """
         args = shlex.split(line[:begidx]) if line[:begidx].strip() else []
 
         available_monsters = cowsay.list_cows()
@@ -247,7 +309,11 @@ class MUDClient(cmd.Cmd):
         return []
 
     def handle_server_response(self, response):
-        """Обрабатывает ответ от сервера и выводит информацию пользователю"""
+        """Обработать ответ от сервера.
+
+        Args:
+            response: Строка ответа от сервера.
+        """
         lines = response.strip().split("\n")
 
         for line in lines:
@@ -258,19 +324,19 @@ class MUDClient(cmd.Cmd):
             cmd = parts[0]
             args = parts[1] if len(parts) > 1 else ""
 
-            if cmd == "MOVED:":
+            if cmd == f"{const.RESP_MOVED}:":
                 coords = args.split()
                 if len(coords) == 2:
                     print(f"Moved to ({coords[0]}, {coords[1]})")
-            elif cmd == "ENCOUNTER:":
+            elif cmd == f"{const.RESP_ENCOUNTER}:":
                 enc_parts = args.split(" ", 1)
                 if len(enc_parts) == 2:
                     monster_name = enc_parts[0]
                     message = enc_parts[1]
                     self.display_monster(monster_name, message)
-            elif cmd == "ADDED:":
+            elif cmd == f"{const.RESP_ADDED}:":
                 print(args)
-            elif cmd == "ATTACK:":
+            elif cmd == f"{const.RESP_ATTACK}:":
                 attack_parts = args.split()
                 if len(attack_parts) >= 3:
                     monster_name = attack_parts[0]
@@ -279,17 +345,22 @@ class MUDClient(cmd.Cmd):
 
                     print(f"Attacked {monster_name}, damage {damage} hp")
 
-                    if "KILLED" in args:
+                    if const.RESP_KILLED in args:
                         print(f"{monster_name} died")
                     else:
                         print(f"{monster_name} now has {hp_left}")
-            elif cmd == "ERROR:":
+            elif cmd == f"{const.RESP_ERROR}:":
                 print(args)
-            elif cmd == "SAYALL:":
+            elif cmd == f"{const.RESP_SAYALL}:":
                 print(args)
 
     def display_monster(self, monster_name, message):
-        """Отображает монстра с использованием cowsay"""
+        """Отобразить монстра с использованием cowsay.
+
+        Args:
+            monster_name: Имя монстра.
+            message: Сообщение от монстра.
+        """
         if monster_name == "jgsbat":
             try:
                 with open("jgsbat.cow", "r") as f:
@@ -304,43 +375,47 @@ class MUDClient(cmd.Cmd):
                 print(f"Monster {monster_name} says: {message}")
 
     def do_quit(self, arg):
-        """Exit the game"""
+        """Выйти из игры.
+
+        Args:
+            arg: Аргументы команды (не используются).
+
+        Returns:
+            bool: True для выхода из цикла cmd.
+        """
         if self.socket:
             try:
                 self.socket.close()
-            except:
+            except Exception:
                 pass
         return True
 
     def do_exit(self, arg):
-        """Exit the game"""
+        """Выйти из игры (синоним для quit).
+
+        Args:
+            arg: Аргументы команды (не используются).
+
+        Returns:
+            bool: True для выхода из цикла cmd.
+        """
         return self.do_quit(arg)
 
 
-def main():
-    host = 'localhost'
-    port = 65432
-    username = None
+def start_client(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
+    """Запустить клиента MOOD.
 
-    # Проверяем аргументы командной строки для указания username и host:port
-    if len(sys.argv) > 1:
-        # Формат: python mymud.py username [host:port]
-        username = sys.argv[1]
-        if len(sys.argv) > 2:
-            server_addr = sys.argv[2].split(':')
-            host = server_addr[0]
-            if len(server_addr) > 1:
-                port = int(server_addr[1])
-
+    Args:
+        host: Адрес сервера.
+        port: Порт сервера.
+        username: Имя пользователя.
+    """
     if not username:
-        print("Username required: python mymud.py username [host:port]")
+        print("Username required")
         sys.exit(1)
 
     try:
-        MUDClient(host, port, username).cmdloop()
+        client = MUDClient(host, port, username)
+        client.cmdloop()
     except KeyboardInterrupt:
         print("\nExiting game...")
-
-
-if __name__ == "__main__":
-    main()

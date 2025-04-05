@@ -59,8 +59,21 @@ class MUDGame:
             return self.handle_attack(parts[1:])
         elif cmd == "get_weapons":
             return self.handle_get_weapons(), None
+        elif cmd == "sayall":
+            return self.handle_sayall(parts[1:])
         else:
             return f"ERROR: Unknown command {cmd}", None
+
+    def handle_sayall(self, args):
+        """Обрабатывает команду отправки сообщения всем игрокам"""
+        if not args:
+            return "ERROR: Empty message", None
+
+        message = args[0] if len(args) == 1 else " ".join(args)
+        broadcast_msg = f"BROADCAST: {self.username}: {message}"
+
+        # Отправляем подтверждение отправителю
+        return "SAYALL: Message sent", broadcast_msg
 
     def handle_move(self, args):
         """Обрабатывает команду перемещения игрока"""

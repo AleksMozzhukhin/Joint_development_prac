@@ -127,6 +127,15 @@ class MUDClient(cmd.Cmd):
         response = self.send_command("move 1 0")
         self.handle_server_response(response)
 
+    def do_sayall(self, arg):
+        """Send a message to all players: sayall <message> or sayall "message with spaces" """
+        if not arg:
+            print("Message cannot be empty")
+            return
+
+        response = self.send_command(f"sayall {arg}")
+        self.handle_server_response(response)
+
     def do_addmon(self, arg):
         """Add monster to the map: addmon name coords x y hp health hello "message" """
         try:
@@ -275,6 +284,8 @@ class MUDClient(cmd.Cmd):
                     else:
                         print(f"{monster_name} now has {hp_left}")
             elif cmd == "ERROR:":
+                print(args)
+            elif cmd == "SAYALL:":
                 print(args)
 
     def display_monster(self, monster_name, message):

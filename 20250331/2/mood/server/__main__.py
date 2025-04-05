@@ -7,10 +7,12 @@ from ..server.game_server import run_server
 
 
 def parse_args():
-    """Разобрать аргументы командной строки.
+    """
+    Разобрать аргументы командной строки.
 
     Returns:
         argparse.Namespace: Аргументы командной строки.
+
     """
     parser = argparse.ArgumentParser(description='MOOD Server')
     parser.add_argument(

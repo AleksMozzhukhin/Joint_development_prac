@@ -17,7 +17,8 @@ class MUDClient(cmd.Cmd):
     intro = "<<< Welcome to MOOD (MUD with cowsay) Client 0.2.0 >>>"
 
     def __init__(self, host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
-        """Инициализировать клиента.
+        """
+        Инициализировать клиента.
 
         Args:
             host: Адрес сервера.
@@ -110,7 +111,8 @@ class MUDClient(cmd.Cmd):
                 i += 2
 
     def send_command(self, command):
-        """Отправить команду на сервер и получить ответ.
+        """
+        Отправить команду на сервер и получить ответ.
 
         Args:
             command: Команда для отправки.
@@ -127,7 +129,8 @@ class MUDClient(cmd.Cmd):
             return f"{const.RESP_ERROR}: Connection failed"
 
     def do_up(self, arg):
-        """Переместить игрока вверх на одну позицию.
+        """
+        Переместить игрока вверх на одну позицию.
 
         Args:
             arg: Аргументы команды (не используются).
@@ -136,7 +139,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def do_down(self, arg):
-        """Переместить игрока вниз на одну позицию.
+        """
+        Переместить игрока вниз на одну позицию.
 
         Args:
             arg: Аргументы команды (не используются).
@@ -145,7 +149,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def do_left(self, arg):
-        """Переместить игрока влево на одну позицию.
+        """
+        Переместить игрока влево на одну позицию.
 
         Args:
             arg: Аргументы команды (не используются).
@@ -154,7 +159,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def do_right(self, arg):
-        """Переместить игрока вправо на одну позицию.
+        """
+        Переместить игрока вправо на одну позицию.
 
         Args:
             arg: Аргументы команды (не используются).
@@ -163,7 +169,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def do_sayall(self, arg):
-        """Отправить сообщение всем игрокам.
+        """
+        Отправить сообщение всем игрокам.
 
         Args:
             arg: Текст сообщения.
@@ -176,7 +183,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def do_addmon(self, arg):
-        """Добавить монстра на карту.
+        """
+        Добавить монстра на карту.
 
         Args:
             arg: Аргументы в формате: name coords x y hp health hello "message".
@@ -188,7 +196,8 @@ class MUDClient(cmd.Cmd):
             print("Invalid command syntax")
 
     def process_addmon(self, args):
-        """Обработать аргументы команды addmon.
+        """
+        Обработать аргументы команды addmon.
 
         Args:
             args: Список аргументов.
@@ -243,7 +252,8 @@ class MUDClient(cmd.Cmd):
             return
 
     def do_attack(self, arg):
-        """Атаковать монстра.
+        """
+        Атаковать монстра.
 
         Args:
             arg: Аргументы в формате: <monster_name> with <weapon>.
@@ -275,7 +285,8 @@ class MUDClient(cmd.Cmd):
         self.handle_server_response(response)
 
     def complete_attack(self, text, line, begidx, endidx):
-        """Автодополнение для команды attack.
+        """
+        Автодополнение для команды attack.
 
         Args:
             text: Текст для дополнения.
@@ -309,7 +320,8 @@ class MUDClient(cmd.Cmd):
         return []
 
     def handle_server_response(self, response):
-        """Обработать ответ от сервера.
+        """
+        Обработать ответ от сервера.
 
         Args:
             response: Строка ответа от сервера.
@@ -355,7 +367,8 @@ class MUDClient(cmd.Cmd):
                 print(args)
 
     def display_monster(self, monster_name, message):
-        """Отобразить монстра с использованием cowsay.
+        """
+        Отобразить монстра с использованием cowsay.
 
         Args:
             monster_name: Имя монстра.
@@ -375,7 +388,8 @@ class MUDClient(cmd.Cmd):
                 print(f"Monster {monster_name} says: {message}")
 
     def do_quit(self, arg):
-        """Выйти из игры.
+        """
+        Выйти из игры.
 
         Args:
             arg: Аргументы команды (не используются).
@@ -391,7 +405,8 @@ class MUDClient(cmd.Cmd):
         return True
 
     def do_exit(self, arg):
-        """Выйти из игры (синоним для quit).
+        """
+        Выйти из игры (синоним для quit).
 
         Args:
             arg: Аргументы команды (не используются).
@@ -403,7 +418,8 @@ class MUDClient(cmd.Cmd):
 
 
 def start_client(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
-    """Запустить клиента MOOD.
+    """
+    Запустить клиента MOOD.
 
     Args:
         host: Адрес сервера.

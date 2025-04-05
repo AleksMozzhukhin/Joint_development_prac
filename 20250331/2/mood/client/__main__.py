@@ -7,7 +7,8 @@ from ..client.game_client import start_client
 
 
 def parse_args():
-    """Разобрать аргументы командной строки.
+    """
+    Разобрать аргументы командной строки.
 
     Returns:
         argparse.Namespace: Аргументы командной строки.

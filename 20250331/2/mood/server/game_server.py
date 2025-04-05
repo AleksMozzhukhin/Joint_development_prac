@@ -11,7 +11,8 @@ global_monsters = {}
 
 
 async def broadcast_message(message, exclude_writer=None):
-    """Отправить сообщение всем подключенным клиентам, кроме исключенного.
+    """
+    Отправить сообщение всем подключенным клиентам, кроме исключенного.
 
     Args:
         message: Сообщение для отправки.
@@ -43,7 +44,8 @@ class MUDGame:
     """Класс для управления игровым процессом конкретного игрока."""
 
     def __init__(self, username=None):
-        """Инициализировать игру для пользователя.
+        """
+        Инициализировать игру для пользователя.
 
         Args:
             username: Имя игрока.
@@ -55,7 +57,8 @@ class MUDGame:
         self.username = username  # Сохраняем имя пользователя
 
     def handle_command(self, command):
-        """Обработать команду от клиента.
+        """
+        Обработать команду от клиента.
 
         Args:
             command: Строка с командой от клиента.
@@ -83,7 +86,8 @@ class MUDGame:
             return f"{const.RESP_ERROR}: Unknown command {cmd}", None
 
     def handle_sayall(self, args):
-        """Обработать команду отправки сообщения всем игрокам.
+        """
+        Обработать команду отправки сообщения всем игрокам.
 
         Args:
             args: Аргументы команды sayall.
@@ -101,7 +105,8 @@ class MUDGame:
         return f"{const.RESP_SAYALL}: Message sent", broadcast_msg
 
     def handle_move(self, args):
-        """Обработать команду перемещения игрока.
+        """
+        Обработать команду перемещения игрока.
 
         Args:
             args: Аргументы команды move.
@@ -131,7 +136,8 @@ class MUDGame:
         return response
 
     def handle_addmon(self, args):
-        """Обработать команду добавления монстра.
+        """
+        Обработать команду добавления монстра.
 
         Args:
             args: Аргументы команды addmon.
@@ -175,7 +181,8 @@ class MUDGame:
             return f"{const.RESP_ERROR}: Invalid addmon parameters", None
 
     def handle_attack(self, args):
-        """Обработать команду атаки монстра.
+        """
+        Обработать команду атаки монстра.
 
         Args:
             args: Аргументы команды attack.
@@ -232,7 +239,8 @@ class MUDGame:
             return f"{const.RESP_ERROR}: Invalid attack parameters", None
 
     def handle_get_weapons(self):
-        """Получить список доступных оружий и их урон.
+        """
+        Получить список доступных оружий и их урон.
 
         Returns:
             str: Строка со списком оружия и урона.
@@ -242,7 +250,8 @@ class MUDGame:
 
 
 async def handle_client(reader, writer):
-    """Обработать соединение с клиентом.
+    """
+    Обработать соединение с клиентом.
 
     Args:
         reader: Объект для чтения данных от клиента.
@@ -350,7 +359,8 @@ async def handle_client(reader, writer):
 
 
 async def start_server(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT):
-    """Запустить сервер MOOD.
+    """
+    Запустить сервер MOOD.
 
     Args:
         host: Хост для прослушивания.
@@ -368,7 +378,8 @@ async def start_server(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT):
 
 
 async def run_server(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT):
-    """Запустить сервер и держать его работающим.
+    """
+    Запустить сервер и держать его работающим.
 
     Args:
         host: Хост для прослушивания.

@@ -31,6 +31,11 @@ def parse_args():
         default=const.DEFAULT_PORT,
         help=f'Server port (default: {const.DEFAULT_PORT})'
     )
+    parser.add_argument(
+        '--file',
+        type=str,
+        help='Path to a command file (.mood) to execute'
+    )
     return parser.parse_args()
 
 
@@ -38,7 +43,7 @@ def main():
     """Основная функция запуска клиента."""
     args = parse_args()
     try:
-        start_client(args.host, args.port, args.username)
+        start_client(args.host, args.port, args.username, args.file)
     except KeyboardInterrupt:
         print("\nExiting game...")
         sys.exit(0)

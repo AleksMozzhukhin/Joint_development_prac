@@ -7,6 +7,8 @@ import cowsay
 import sys
 import readline
 import threading
+import time
+import os
 from ..common import constants as const
 
 
@@ -16,7 +18,7 @@ class MUDClient(cmd.Cmd):
     prompt = "> "
     intro = "<<< Welcome to MOOD (MUD with cowsay) Client 0.2.0 >>>"
 
-    def __init__(self, host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
+    def __init__(self, host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None, command_file=None):
         """
         Инициализировать клиента.
 
@@ -24,6 +26,7 @@ class MUDClient(cmd.Cmd):
             host: Адрес сервера.
             port: Порт сервера.
             username: Имя пользователя.
+            command_file: Путь к файлу с командами для выполнения.
         """
         super().__init__()
         self.host = host
@@ -32,12 +35,23 @@ class MUDClient(cmd.Cmd):
         self.weapons = {}
         self.username = username or "Unknown"
         self.running = True
+        self.command_file = command_file
+        self.executing_file = False
 
         self.connect()
 
         self.receiver_thread = threading.Thread(target=self.receive_messages)
         self.receiver_thread.daemon = True
         self.receiver_thread.start()
+
+        # Если указан файл команд, выводим информацию о нем
+        if self.command_file:
+            print(f"Command file specified: {self.command_file}")
+            # Проверяем существование файла
+            if os.path.exists(self.command_file):
+                print(f"Command file exists: {self.command_file}")
+            else:
+                print(f"WARNING: Command file not found: {self.command_file}")
 
     def connect(self):
         """Подключиться к серверу."""
@@ -416,8 +430,98 @@ class MUDClient(cmd.Cmd):
         """
         return self.do_quit(arg)
 
+    def execute_commands_from_file(self):
+        """
+        Выполнить команды из файла.
 
-def start_client(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None):
+        Читает команды из указанного файла и выполняет их последовательно
+        с задержкой не менее 1 секунды между командами.
+        """
+        try:
+            print(f"Starting execution of commands from file: {self.command_file}")
+            self.executing_file = True
+
+            with open(self.command_file, 'r') as f:
+                commands = [line.strip() for line in f if line.strip() and not line.strip().startswith('#')]
+
+            print(f"Loaded {len(commands)} commands from file")
+
+            for i, command in enumerate(commands):
+                if not self.running:
+                    print("Execution stopped: client is no longer running")
+                    break
+
+                print(f"Executing command {i+1}/{len(commands)}: {command}")
+
+                # Разбираем команду как в onecmd
+                line = command.strip()
+                if not line:
+                    continue
+
+                # Проверяем на выход
+                if line == 'quit' or line == 'exit':
+                    print("Exit command detected, stopping execution")
+                    self.do_quit('')
+                    break
+
+                # Разбираем команду на имя и аргументы
+                cmd, arg, line = self.parseline(line)
+                if not cmd:
+                    print(f"Invalid command: {line}")
+                    continue
+
+                # Ищем метод-обработчик
+                func = getattr(self, 'do_' + cmd, None)
+                if not func:
+                    print(f"Unknown command: {cmd}")
+                    continue
+
+                # Выполняем команду
+                print(f"Executing: do_{cmd}({arg})")
+                func(arg)
+
+                # Задержка между командами не менее 1 секунды
+                print(f"Waiting 1 second before next command...")
+                time.sleep(1)
+
+            print("Command file execution completed")
+
+            # Завершаем работу клиента после выполнения всех команд
+            print("Exiting client after command file execution")
+            self.executing_file = False
+            self.do_quit('')
+
+        except FileNotFoundError:
+            print(f"Error: File not found: {self.command_file}")
+            self.executing_file = False
+            self.do_quit('')
+        except Exception as e:
+            print(f"Error executing commands from file: {e}")
+            self.executing_file = False
+            self.do_quit('')
+
+    def cmdloop(self, intro=None):
+        """
+        Запустить основной цикл обработки команд.
+
+        Переопределяет метод cmdloop из cmd.Cmd для поддержки выполнения команд из файла.
+
+        Args:
+            intro: Вступительное сообщение.
+        """
+        print("Starting cmdloop")
+        if self.command_file:
+            print(f"Command file mode: {self.command_file}")
+            # Запускаем выполнение команд из файла напрямую
+            self.execute_commands_from_file()
+            return
+        else:
+            print("Interactive mode")
+            # Стандартный интерактивный режим
+            return super().cmdloop(intro)
+
+
+def start_client(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None, command_file=None):
     """
     Запустить клиента MOOD.
 
@@ -425,13 +529,20 @@ def start_client(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT, username=None
         host: Адрес сервера.
         port: Порт сервера.
         username: Имя пользователя.
+        command_file: Путь к файлу с командами для выполнения.
     """
     if not username:
         print("Username required")
         sys.exit(1)
 
+    # Проверяем расширение файла команд, если он указан
+    if command_file and not command_file.endswith('.mood'):
+        print("Warning: Command file should have .mood extension")
+
+    print(f"Starting client with host={host}, port={port}, username={username}, command_file={command_file}")
+
     try:
-        client = MUDClient(host, port, username)
+        client = MUDClient(host, port, username, command_file)
         client.cmdloop()
     except KeyboardInterrupt:
         print("\nExiting game...")

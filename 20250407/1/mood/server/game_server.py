@@ -1,7 +1,12 @@
-"""Модуль серверной части игры MOOD."""
+"""Модуль серверной части игры MOOD.
+
+Этот модуль содержит реализацию серверной логики многопользовательской текстовой игры MOOD.
+Он обрабатывает подключения клиентов, управляет состоянием игры и взаимодействует с игроками.
+"""
 
 import asyncio
 import shlex
+import random
 from ..common import constants as const
 
 games = {}  # экземпляры игр для разных пользователей
@@ -13,6 +18,9 @@ global_monsters = {}
 async def broadcast_message(message, exclude_writer=None):
     """
     Отправить сообщение всем подключенным клиентам, кроме исключенного.
+
+    Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение.
+    Если при отправке возникает ошибка, клиент помечается для удаления.
 
     Args:
         message: Сообщение для отправки.
@@ -40,12 +48,93 @@ async def broadcast_message(message, exclude_writer=None):
             del clients[writer]
 
 
+async def move_monsters():
+    """
+    Периодически перемещать случайных монстров в случайном направлении.
+
+    Эта асинхронная функция запускается как отдельная задача и каждые 30 секунд
+    выбирает случайного монстра и пытается переместить его в случайном направлении.
+    Если выбранное направление занято другим монстром, функция выбирает другого монстра
+    и направление, пока не найдет свободную клетку.
+    При успешном перемещении всем игрокам отправляется сообщение о движении монстра.
+    Если на новой позиции находятся игроки, инициируется "энкаунтер".
+    """
+    while True:
+        await asyncio.sleep(30)  # Ждем 30 секунд
+
+        if not global_monsters:  # Если нет монстров, пропускаем
+            continue
+
+        # Выбираем случайного монстра и пытаемся его переместить
+        success = False
+        attempts = 0
+        max_attempts = 10 * len(global_monsters)  # Ограничиваем количество попыток
+
+        while not success and attempts < max_attempts:
+            attempts += 1
+
+            # Получаем список позиций всех монстров
+            monster_positions = list(global_monsters.keys())
+            if not monster_positions:
+                break
+
+            # Выбираем случайного монстра
+            monster_pos = random.choice(monster_positions)
+            monster_name, monster_hello, monster_hp = global_monsters[monster_pos]
+
+            # Выбираем случайное направление (dx, dy)
+            directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]  # right, left, down, up
+            direction = random.choice(directions)
+            dx, dy = direction
+
+            # Определяем новую позицию
+            new_x = (monster_pos[0] + dx) % const.GRID_SIZE
+            new_y = (monster_pos[1] + dy) % const.GRID_SIZE
+            new_pos = (new_x, new_y)
+
+            # Проверяем, свободна ли новая позиция
+            if new_pos in global_monsters:
+                continue  # Позиция занята другим монстром, пробуем ещё раз
+
+            # Перемещаем монстра
+            del global_monsters[monster_pos]
+            global_monsters[new_pos] = (monster_name, monster_hello, monster_hp)
+
+            # Определяем строковое представление направления
+            direction_str = "right" if dx == 1 else "left" if dx == -1 else "down" if dy == 1 else "up"
+
+            # Отправляем сообщение всем игрокам
+            await broadcast_message(f"{const.RESP_BROADCAST}: {monster_name} moved one cell {direction_str}")
+
+            # Проверяем, есть ли игроки на новой позиции монстра
+            affected_players = []
+            for username, game in games.items():
+                if game.player_x == new_x and game.player_y == new_y:
+                    affected_players.append(username)
+
+            # Если есть игроки, вызываем "энкаунтер"
+            for username in affected_players:
+                for writer, name in clients.items():
+                    if name == username:
+                        writer.write(f"{const.RESP_ENCOUNTER}: {monster_name} {monster_hello}\n".encode())
+                        await writer.drain()
+
+            success = True
+
+
 class MUDGame:
-    """Класс для управления игровым процессом конкретного игрока."""
+    """
+    Класс для управления игровым процессом конкретного игрока.
+
+    Этот класс хранит состояние игры для одного пользователя и
+    обрабатывает команды, которые приходят от клиента.
+    """
 
     def __init__(self, username=None):
         """
         Инициализировать игру для пользователя.
+
+        Создает новую игру с указанным именем пользователя и начальными параметрами.
 
         Args:
             username: Имя игрока.
@@ -59,6 +148,8 @@ class MUDGame:
     def handle_command(self, command):
         """
         Обработать команду от клиента.
+
+        Разбирает команду на части и вызывает соответствующий обработчик.
 
         Args:
             command: Строка с командой от клиента.
@@ -108,6 +199,9 @@ class MUDGame:
         """
         Обработать команду перемещения игрока.
 
+        Перемещает игрока на указанное смещение и проверяет, есть ли на новой
+        позиции монстры для инициирования "энкаунтера".
+
         Args:
             args: Аргументы команды move.
 
@@ -138,6 +232,8 @@ class MUDGame:
     def handle_addmon(self, args):
         """
         Обработать команду добавления монстра.
+
+        Добавляет нового монстра на указанную позицию на карте.
 
         Args:
             args: Аргументы команды addmon.
@@ -183,6 +279,9 @@ class MUDGame:
     def handle_attack(self, args):
         """
         Обработать команду атаки монстра.
+
+        Атакует монстра на текущей позиции игрока с указанным уроном.
+        Если урон достаточен для убийства монстра, монстр удаляется с карты.
 
         Args:
             args: Аргументы команды attack.
@@ -252,6 +351,9 @@ class MUDGame:
 async def handle_client(reader, writer):
     """
     Обработать соединение с клиентом.
+
+    Эта асинхронная функция обрабатывает подключение нового клиента.
+    Она выполняет процедуру входа и затем обрабатывает команды от клиента.
 
     Args:
         reader: Объект для чтения данных от клиента.
@@ -362,6 +464,8 @@ async def start_server(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT):
     """
     Запустить сервер MOOD.
 
+    Создает и запускает сервер на указанном хосте и порту.
+
     Args:
         host: Хост для прослушивания.
         port: Порт для прослушивания.
@@ -381,11 +485,23 @@ async def run_server(host=const.DEFAULT_HOST, port=const.DEFAULT_PORT):
     """
     Запустить сервер и держать его работающим.
 
+    Запускает сервер и задачу перемещения монстров и ожидает их выполнения.
+
     Args:
         host: Хост для прослушивания.
         port: Порт для прослушивания.
     """
     server = await start_server(host, port)
 
-    async with server:
-        await server.serve_forever()
+    # Запускаем задачу для перемещения монстров
+    monster_mover = asyncio.create_task(move_monsters())
+
+    try:
+        async with server:
+            await server.serve_forever()
+    finally:
+        monster_mover.cancel()
+        try:
+            await monster_mover
+        except asyncio.CancelledError:
+            pass

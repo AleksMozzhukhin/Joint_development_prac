@@ -7,6 +7,9 @@
 import asyncio
 import shlex
 import random
+import os
+import gettext
+from babel.support import Translations
 from ..common import constants as const
 
 games = {}  # экземпляры игр для разных пользователей
@@ -14,14 +17,21 @@ clients = {}  # соответствие writer -> username
 usernames = set()
 global_monsters = {}
 moving_monsters_enabled = True  # По умолчанию режим бродячих монстров включен
+client_locales = {}  # соответствие writer -> locale
+
+locale_dir = os.path.join(os.path.dirname(__file__), 'locale')
+translations = {
+    'en': gettext.NullTranslations(),  # Для английского используем исходные строки
+    'ru_RU.UTF8': gettext.translation('messages', locale_dir, ['ru'], fallback=True)
+}
 
 
 async def broadcast_message(message, exclude_writer=None):
     """
     Отправить сообщение всем подключенным клиентам, кроме исключенного.
 
-    Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение.
-    Если при отправке возникает ошибка, клиент помечается для удаления.
+    Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение
+    с учетом локали каждого клиента.
 
     Args:
         message: Сообщение для отправки.
@@ -32,7 +42,14 @@ async def broadcast_message(message, exclude_writer=None):
     for writer, username in clients.items():
         if writer != exclude_writer:
             try:
-                writer.write(f"{message}\n".encode())
+                # Получаем локаль клиента
+                locale = client_locales.get(writer, 'en')
+                translator = get_translator(locale)
+
+                # Переводим сообщение
+                translated_message = translator.gettext(message)
+
+                writer.write(f"{translated_message}\n".encode())
                 await writer.drain()
             except Exception as e:
                 print(f"Error broadcasting to {username}: {e}")
@@ -46,6 +63,8 @@ async def broadcast_message(message, exclude_writer=None):
                 usernames.remove(username)
             if username in games:
                 del games[username]
+            if writer in client_locales:
+                del client_locales[writer]
             del clients[writer]
 
 
@@ -126,6 +145,18 @@ async def move_monsters():
 
             success = True
 
+
+def get_translator(locale='en'):
+    """
+    Получить объект перевода для указанной локали.
+
+    Args:
+        locale: Имя локали.
+
+    Returns:
+        gettext.NullTranslations or gettext.GNUTranslations: Объект для перевода строк.
+    """
+    return translations.get(locale, translations['en'])
 
 class MUDGame:
     """

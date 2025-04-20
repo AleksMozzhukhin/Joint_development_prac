@@ -460,6 +460,37 @@ class MUDClient(cmd.Cmd):
         """
         return self.do_quit(arg)
 
+    def do_locale(self, arg):
+        """
+        Установить локаль для клиента.
+
+        Args:
+            arg: Имя локали (например, "ru_RU.UTF8").
+        """
+        if not arg:
+            print("Usage: locale <locale_name>")
+            return
+
+        locale_name = arg.strip()
+        response = self.send_command(f"{const.CMD_LOCALE} {locale_name}")
+        print(response)
+
+    def complete_locale(self, text, line, begidx, endidx):
+        """
+        Автодополнение для команды locale.
+
+        Args:
+            text: Текст для дополнения.
+            line: Полная строка.
+            begidx: Начальный индекс.
+            endidx: Конечный индекс.
+
+        Returns:
+            list: Список вариантов автодополнения.
+        """
+        locales = ["en", "ru_RU.UTF8"]
+        return [locale for locale in locales if locale.startswith(text)]
+
     def execute_commands_from_file(self):
         """
         Выполнить команды из файла.

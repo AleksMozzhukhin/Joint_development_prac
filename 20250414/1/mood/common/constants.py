@@ -11,6 +11,7 @@ CMD_ADDMON = "addmon"
 CMD_ATTACK = "attack"
 CMD_GET_WEAPONS = "get_weapons"
 CMD_SAYALL = "sayall"
+CMD_MOVEMONSTERS = "movemonsters"
 CMD_QUIT = "quit"
 CMD_EXIT = "exit"
 

@@ -13,6 +13,7 @@ games = {}  # экземпляры игр для разных пользоват
 clients = {}  # соответствие writer -> username
 usernames = set()
 global_monsters = {}
+moving_monsters_enabled = True  # По умолчанию режим бродячих монстров включен
 
 
 async def broadcast_message(message, exclude_writer=None):
@@ -61,6 +62,10 @@ async def move_monsters():
     """
     while True:
         await asyncio.sleep(30)  # Ждем 30 секунд
+
+        # Проверяем, включен ли режим бродячих монстров
+        if not moving_monsters_enabled:
+            continue
 
         if not global_monsters:  # Если нет монстров, пропускаем
             continue
@@ -173,8 +178,35 @@ class MUDGame:
             return self.handle_get_weapons(), None
         elif cmd == const.CMD_SAYALL:
             return self.handle_sayall(parts[1:])
+        elif cmd == const.CMD_MOVEMONSTERS:
+            return self.handle_movemonsters(parts[1:])
         else:
             return f"{const.RESP_ERROR}: Unknown command {cmd}", None
+
+    def handle_movemonsters(self, args):
+        """
+        Обработать команду включения/выключения режима бродячих монстров.
+
+        Args:
+            args: Аргументы команды movemonsters.
+
+        Returns:
+            tuple: Пара (ответ клиенту, широковещательное сообщение).
+        """
+        global moving_monsters_enabled
+
+        if not args or len(args) != 1:
+            return f"{const.RESP_ERROR}: Invalid parameters. Use 'on' or 'off'", None
+
+        mode = args[0].lower()
+        if mode == "on":
+            moving_monsters_enabled = True
+            return f"Moving monsters: on", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement ON"
+        elif mode == "off":
+            moving_monsters_enabled = False
+            return f"Moving monsters: off", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement OFF"
+        else:
+            return f"{const.RESP_ERROR}: Invalid parameter. Use 'on' or 'off'", None
 
     def handle_sayall(self, args):
         """

@@ -142,6 +142,36 @@ class MUDClient(cmd.Cmd):
             print(f"Error communicating with server: {e}")
             return f"{const.RESP_ERROR}: Connection failed"
 
+    def do_movemonsters(self, arg):
+        """
+        Включить или выключить режим бродячих монстров.
+
+        Args:
+            arg: "on" для включения или "off" для выключения.
+        """
+        args = arg.strip().lower()
+        if not args or args not in ["on", "off"]:
+            print("Usage: movemonsters on|off")
+            return
+
+        response = self.send_command(f"{const.CMD_MOVEMONSTERS} {args}")
+        print(response)
+
+    def complete_movemonsters(self, text, line, begidx, endidx):
+        """
+        Автодополнение для команды movemonsters.
+
+        Args:
+            text: Текст для дополнения.
+            line: Полная строка.
+            begidx: Начальный индекс.
+            endidx: Конечный индекс.
+
+        Returns:
+            list: Список вариантов автодополнения.
+        """
+        options = ["on", "off"]
+        return [option for option in options if option.startswith(text.lower())]
     def do_up(self, arg):
         """
         Переместить игрока вверх на одну позицию.

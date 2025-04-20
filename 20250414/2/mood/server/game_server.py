@@ -211,18 +211,14 @@ class MUDGame:
             return self.handle_sayall(parts[1:])
         elif cmd == const.CMD_MOVEMONSTERS:
             return self.handle_movemonsters(parts[1:])
+        elif cmd == const.CMD_LOCALE:
+            return f"{const.RESP_ERROR}: Locale command cannot be processed here", None
         else:
             return f"{const.RESP_ERROR}: Unknown command {cmd}", None
 
     def handle_movemonsters(self, args):
         """
         Обработать команду включения/выключения режима бродячих монстров.
-
-        Args:
-            args: Аргументы команды movemonsters.
-
-        Returns:
-            tuple: Пара (ответ клиенту, широковещательное сообщение).
         """
         global moving_monsters_enabled
 
@@ -232,10 +228,10 @@ class MUDGame:
         mode = args[0].lower()
         if mode == "on":
             moving_monsters_enabled = True
-            return f"Moving monsters: on", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement ON"
+            return "Moving monsters: on", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement ON"
         elif mode == "off":
             moving_monsters_enabled = False
-            return f"Moving monsters: off", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement OFF"
+            return "Moving monsters: off", f"{const.RESP_BROADCAST}: User '{self.username}' turned monster movement OFF"
         else:
             return f"{const.RESP_ERROR}: Invalid parameter. Use 'on' or 'off'", None
 
@@ -295,14 +291,6 @@ class MUDGame:
     def handle_addmon(self, args):
         """
         Обработать команду добавления монстра.
-
-        Добавляет нового монстра на указанную позицию на карте.
-
-        Args:
-            args: Аргументы команды addmon.
-
-        Returns:
-            tuple: Пара (ответ клиенту, широковещательное сообщение).
         """
         if len(args) != 5:
             return f"{const.RESP_ERROR}: Invalid addmon parameters", None
@@ -326,6 +314,7 @@ class MUDGame:
 
             result = f"{const.RESP_ADDED}: {monster_name} {x} {y} {hello_string}"
 
+            # Сообщение для локализации
             broadcast_msg = (
                 f"{const.RESP_BROADCAST}: User '{self.username}' added monster "
                 f"'{monster_name}' with {hitpoints} HP at ({x}, {y})"
@@ -335,22 +324,12 @@ class MUDGame:
                 result += " (replaced old monster)"
 
             return result, broadcast_msg
-
         except ValueError:
             return f"{const.RESP_ERROR}: Invalid addmon parameters", None
 
     def handle_attack(self, args):
         """
         Обработать команду атаки монстра.
-
-        Атакует монстра на текущей позиции игрока с указанным уроном.
-        Если урон достаточен для убийства монстра, монстр удаляется с карты.
-
-        Args:
-            args: Аргументы команды attack.
-
-        Returns:
-            tuple: Пара (ответ клиенту, широковещательное сообщение).
         """
         if len(args) != 2:
             return f"{const.RESP_ERROR}: Invalid attack parameters", None
@@ -377,14 +356,14 @@ class MUDGame:
                     weapon_name = w_name
                     break
 
-            broadcast_msg = (
-                f"{const.RESP_BROADCAST}: User '{self.username}' attacked "
-                f"'{current_monster_name}' with {weapon_name}, dealing {actual_damage} damage."
-            )
-
+            # Сообщения для локализации с поддержкой множественного числа для HP
             if monster_hp <= 0:
                 del global_monsters[position]
-                broadcast_msg += f" {current_monster_name} was killed!"
+                broadcast_msg = (
+                    f"{const.RESP_BROADCAST}: User '{self.username}' attacked "
+                    f"'{current_monster_name}' with {weapon_name}, dealing {actual_damage} HP. "
+                    f"{current_monster_name} was killed!"
+                )
                 result = (
                     f"{const.RESP_ATTACK}: {current_monster_name} {actual_damage} 0 "
                     f"{const.RESP_KILLED}"
@@ -393,7 +372,11 @@ class MUDGame:
                 global_monsters[position] = (
                     current_monster_name, monster_hello, monster_hp
                 )
-                broadcast_msg += f" {current_monster_name} has {monster_hp} HP left."
+                broadcast_msg = (
+                    f"{const.RESP_BROADCAST}: User '{self.username}' attacked "
+                    f"'{current_monster_name}' with {weapon_name}, dealing {actual_damage} HP. "
+                    f"{current_monster_name} has {monster_hp} HP left."
+                )
                 result = f"{const.RESP_ATTACK}: {current_monster_name} {actual_damage} {monster_hp}"
 
             return result, broadcast_msg
@@ -414,19 +397,14 @@ class MUDGame:
 async def handle_client(reader, writer):
     """
     Обработать соединение с клиентом.
-
-    Эта асинхронная функция обрабатывает подключение нового клиента.
-    Она выполняет процедуру входа и затем обрабатывает команды от клиента.
-
-    Args:
-        reader: Объект для чтения данных от клиента.
-        writer: Объект для отправки данных клиенту.
     """
     client_addr = "{}:{}".format(*writer.get_extra_info('peername'))
     print(f"Connection attempt: {client_addr}")
     username = None
 
     try:
+        # Установка локали по умолчанию для нового клиента
+        client_locales[writer] = 'en'
         data = await reader.readline()
         if not data:
             writer.close()
@@ -492,10 +470,32 @@ async def handle_client(reader, writer):
                 )
                 writer.write(f"{const.RESP_WEAPONS}: {weapons_list}\n".encode())
                 await writer.drain()
+            elif message.lower().startswith(const.CMD_LOCALE):
+                # Обработка команды locale
+                parts = message.split(" ", 1)
+                if len(parts) == 2:
+                    locale_name = parts[1].strip()
+                    # Проверяем, поддерживается ли локаль
+                    if locale_name in translations:
+                        client_locales[writer] = locale_name
+                        # Переводим сообщение ответа с учетом локали
+                        translator = get_translator(locale_name)
+                        response = translator.gettext("Set up locale: {}").format(locale_name)
+                        writer.write(f"{response}\n".encode())
+                    else:
+                        writer.write(f"Unsupported locale: {locale_name}\n".encode())
+                    await writer.drain()
+                else:
+                    writer.write("Invalid locale format\n".encode())
+                    await writer.drain()
             else:
                 response, broadcast_msg = games[username].handle_command(message)
+                # Переводим ответ с учетом локали клиента
+                locale = client_locales.get(writer, 'en')
+                translator = get_translator(locale)
+                translated_response = translator.gettext(response)
 
-                writer.write(f"{response}\n".encode())
+                writer.write(f"{translated_response}\n".encode())
                 await writer.drain()
 
                 if broadcast_msg:

@@ -49,14 +49,13 @@ class TestClientCommandProcessing(unittest.TestCase):
                 sendall_calls_after = self.mock_socket_instance.sendall.call_count
                 recv_calls_after = self.mock_socket_instance.recv.call_count
                 if (sendall_calls_after - sendall_calls_before != 2) or \
-                   (recv_calls_after - recv_calls_before != 2):
+                        (recv_calls_after - recv_calls_before != 2):
                     print("WARNING setUp: Unexpected number of socket calls during MUDClient init!")
 
         except SystemExit as e:
             self.fail(f"MUDClient initialization failed with SystemExit: {e}")
         except Exception as e:
-             self.fail(f"MUDClient initialization failed with Exception: {e}")
-
+            self.fail(f"MUDClient initialization failed with Exception: {e}")
 
         self.mock_socket_instance.sendall.reset_mock()
         self.mock_socket_instance.recv.reset_mock()
@@ -110,6 +109,39 @@ class TestClientCommandProcessing(unittest.TestCase):
 
         self.client.onecmd(user_input)
         self.mock_socket_instance.sendall.assert_called_once_with(expected_protocol_command)
+
+    def test_addmon_command_invalid_params_missing_hp(self):
+        """Тест: команда 'addmon' с пропущенным параметром 'hp'."""
+        user_input = 'addmon Orc coords 3 3 hello "Waaagh!"'
+
+        with patch('sys.stdout', new=self.held_stdout) as fake_stdout:
+            self.client.onecmd(user_input)
+        self.mock_socket_instance.sendall.assert_not_called()
+        output = fake_stdout.getvalue().strip()
+        self.assertIn("Invalid arguments: missing required parameters", output)
+
+    def test_addmon_command_invalid_params_bad_coords(self):
+        """Тест: команда 'addmon' с неверным количеством координат."""
+        user_input = 'addmon Troll coords 7 hp 50 hello "Grrr"'
+
+        with patch('sys.stdout', new=self.held_stdout) as fake_stdout:
+            self.client.onecmd(user_input)
+
+        self.mock_socket_instance.sendall.assert_not_called()
+        output = fake_stdout.getvalue().strip()
+        self.assertTrue(
+            "Invalid arguments" in output or "invalid literal for int()" in output or "IndexError" in output)
+
+    def test_addmon_command_invalid_params_negative_hp(self):
+        """Тест: команда 'addmon' с отрицательным hp."""
+        user_input = 'addmon Skeleton coords 0 0 hp -10 hello "Clack"'
+
+        with patch('sys.stdout', new=self.held_stdout) as fake_stdout:
+            self.client.onecmd(user_input)
+
+        self.mock_socket_instance.sendall.assert_not_called()
+        output = fake_stdout.getvalue().strip()
+        self.assertIn("Invalid arguments: hitpoints must be positive", output)
 
 
 if __name__ == '__main__':

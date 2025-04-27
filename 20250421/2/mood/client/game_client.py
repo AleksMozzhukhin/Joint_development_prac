@@ -175,6 +175,7 @@ class MUDClient(cmd.Cmd):
         """
         options = ["on", "off"]
         return [option for option in options if option.startswith(text.lower())]
+
     def do_up(self, arg):
         """
         Переместить игрока вверх на одну позицию.
@@ -249,13 +250,8 @@ class MUDClient(cmd.Cmd):
         Args:
             args: Список аргументов.
         """
-        if len(args) < 7:
-            print("Invalid arguments")
-            return
-
         try:
             monster_name = args[0]
-
             hello_string = None
             hitpoints = None
             x = None
@@ -264,38 +260,44 @@ class MUDClient(cmd.Cmd):
             i = 1
             while i < len(args):
                 param_name = args[i].lower()
-
                 if param_name == "hello" and i + 1 < len(args):
                     hello_string = args[i + 1]
                     i += 2
                 elif param_name == "hp" and i + 1 < len(args):
-                    hitpoints = int(args[i + 1])
-                    if hitpoints <= 0:
-                        print("Invalid arguments: hitpoints must be positive")
+                    try:
+                        hp_val = int(args[i + 1])
+                        if hp_val <= 0:
+                            print("Invalid arguments: hitpoints must be positive")
+                            return
+                        hitpoints = hp_val
+                    except ValueError:
+                        print("Invalid arguments: hp must be an integer")
                         return
                     i += 2
                 elif param_name == "coords" and i + 2 < len(args):
-                    x = int(args[i + 1])
-                    y = int(args[i + 2])
+                    try:
+                        x = int(args[i + 1])
+                        y = int(args[i + 2])
+                    except ValueError:
+                        print("Invalid arguments: coords must be integers")
+                        return
                     i += 3
                 else:
-                    print("Invalid arguments")
-                    return
+                    i += 1
 
             if hello_string is None or hitpoints is None or x is None or y is None:
                 print("Invalid arguments: missing required parameters")
                 return
 
-            # Отправляем команду на сервер в упрощенном формате
             command = f'{const.CMD_ADDMON} {monster_name} {x} {y} "{hello_string}" {hitpoints}'
             response = self.send_command(command)
-            self.handle_server_response(response)
+            print(response)
 
-        except ValueError:
-            print("Invalid arguments")
-            return
         except IndexError:
-            print("Invalid arguments")
+            if not args:
+                print("Invalid command syntax: missing monster name")
+            else:
+                print("Invalid arguments: incorrect command structure")
             return
 
     def do_attack(self, arg):
@@ -515,7 +517,7 @@ class MUDClient(cmd.Cmd):
                     print("Execution stopped: client is no longer running")
                     break
 
-                print(f"Executing command {i+1}/{len(commands)}: {command}")
+                print(f"Executing command {i + 1}/{len(commands)}: {command}")
 
                 # Разбираем команду как в onecmd
                 line = command.strip()

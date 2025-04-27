@@ -136,10 +136,13 @@ class MUDClient(cmd.Cmd):
         """
         try:
             self.socket.sendall(f"{command}\n".encode())
-            response = self.socket.recv(1024).decode().strip()
+            raw_response = self.socket.recv(1024)
+            if raw_response is None:
+                return f"{const.RESP_ERROR}: Connection failed (recv returned None)"
+            response = raw_response.decode().strip()
             return response
         except Exception as e:
-            print(f"Error communicating with server: {e}")
+            print(f"Error communicating with server: Exception type={type(e)}, Message='{e}'")
             return f"{const.RESP_ERROR}: Connection failed"
 
     def do_movemonsters(self, arg):

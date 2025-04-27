@@ -25,25 +25,46 @@ class TestClientCommandProcessing(unittest.TestCase):
 
         self.mock_socket_instance = MagicMock()
 
-        self.mock_socket_instance.recv.side_effect = [
+        self.mock_socket_constructor.return_value = self.mock_socket_instance
+
+        initial_responses = [
             b"Welcome, TestUser! You are now connected to the MUD.\n",
             f"{const.RESP_WEAPONS}: sword 10 axe 20\n".encode(),
-            b"Some server message\n",
-            b"",
+            b"Unexpected recv call response\n"
         ]
-        self.mock_socket_constructor.return_value = self.mock_socket_instance
+        self.mock_socket_instance.recv.side_effect = iter(initial_responses)
 
         self.mock_readline_patcher = patch('readline.get_line_buffer', return_value="")
         self.mock_readline = self.mock_readline_patcher.start()
 
         self.held_stdout = io.StringIO()
 
-        with patch('builtins.print'):
-            self.client = MUDClient(host='test_host', port=12345, username='TestUser')
-            self.client.running = True
-            self.mock_socket_instance.sendall.reset_mock()
-            self.mock_socket_instance.recv.reset_mock()  # Сбрасываем и recv
+        try:
+            with patch('builtins.print'):
+                sendall_calls_before = self.mock_socket_instance.sendall.call_count
+                recv_calls_before = self.mock_socket_instance.recv.call_count
 
+                self.client = MUDClient(host='test_host', port=12345, username='TestUser')
+
+                sendall_calls_after = self.mock_socket_instance.sendall.call_count
+                recv_calls_after = self.mock_socket_instance.recv.call_count
+                if (sendall_calls_after - sendall_calls_before != 2) or \
+                   (recv_calls_after - recv_calls_before != 2):
+                    print("WARNING setUp: Unexpected number of socket calls during MUDClient init!")
+
+        except SystemExit as e:
+            self.fail(f"MUDClient initialization failed with SystemExit: {e}")
+        except Exception as e:
+             self.fail(f"MUDClient initialization failed with Exception: {e}")
+
+
+        self.mock_socket_instance.sendall.reset_mock()
+        self.mock_socket_instance.recv.reset_mock()
+
+        self.mock_socket_instance.recv.side_effect = None
+        self.mock_socket_instance.recv.return_value = b''
+
+        self.client.running = True
         self.client.weapons = {"sword": 10, "axe": 20}
 
     def tearDown(self):
@@ -58,7 +79,8 @@ class TestClientCommandProcessing(unittest.TestCase):
 
     def test_move_up_command(self):
         """Тест: команда 'up' преобразуется в 'move 0 -1'."""
-        self.mock_socket_instance.recv.return_value = f"{const.RESP_MOVED}: 0 -1\n".encode()
+        expected_response = f"{const.RESP_MOVED}: 0 -1\n".encode()
+        self.mock_socket_instance.recv.return_value = expected_response
 
         self.client.onecmd("up")
 
@@ -70,6 +92,24 @@ class TestClientCommandProcessing(unittest.TestCase):
 
         self.client.onecmd("down")
         self.mock_socket_instance.sendall.assert_called_once_with(b"move 0 1\n")
+
+    def test_addmon_command_valid_1(self):
+        """Тест: валидная команда 'addmon' преобразуется корректно (случай 1)."""
+        user_input = 'addmon Dragon coords 1 2 hp 100 hello "Roar!"'
+        expected_protocol_command = b'addmon Dragon 1 2 "Roar!" 100\n'
+        self.mock_socket_instance.recv.return_value = f"{const.RESP_ADDED}: Dragon 1 2 Roar!\n".encode()
+
+        self.client.onecmd(user_input)
+        self.mock_socket_instance.sendall.assert_called_once_with(expected_protocol_command)
+
+    def test_addmon_command_valid_2(self):
+        """Тест: валидная команда 'addmon' преобразуется корректно (случай 2 - другой порядок)."""
+        user_input = 'addmon Goblin hp 25 hello "Yarr" coords 5 5'
+        expected_protocol_command = b'addmon Goblin 5 5 "Yarr" 25\n'
+        self.mock_socket_instance.recv.return_value = f"{const.RESP_ADDED}: Goblin 5 5 Yarr\n".encode()
+
+        self.client.onecmd(user_input)
+        self.mock_socket_instance.sendall.assert_called_once_with(expected_protocol_command)
 
 
 if __name__ == '__main__':

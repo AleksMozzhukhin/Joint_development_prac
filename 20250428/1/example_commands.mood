@@ -1,0 +1,24 @@
+# Это пример файла команд для MOOD клиента
+# Строки, начинающиеся с '#', считаются комментариями и игнорируются
+
+# Перемещение персонажа
+up
+right
+right
+down
+
+# Добавление монстра
+addmon dragon coords 3 3 hp 100 hello "I am a mighty dragon!"
+
+# Движение к монстру
+right
+down
+
+# Атака монстра
+attack dragon with axe
+
+# Отправка сообщения всем
+sayall I just defeated a dragon!
+
+# Выход из игры
+exit

@@ -1,9 +1,10 @@
 from pathlib import Path
 
+DOIT_CONFIG = {'default_tasks': ['docs']}
 def task_docs():
     """Builds documentation"""
     return{
-        'file_dep': [list(Path(".").glob("*.py"))],
+        'file_dep': [*Path(".").glob("*.py"), *Path(".").glob("*.py")],
         "actions": ["sphinx-build -M html docs/source _build"],
     }
 

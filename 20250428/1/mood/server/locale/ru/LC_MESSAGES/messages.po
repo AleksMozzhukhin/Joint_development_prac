@@ -1,54 +1,71 @@
+
 msgid ""
 msgstr ""
 "Project-Id-Version: mood 0.2.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-20 12:00+0300\n"
 "PO-Revision-Date: 2025-04-20 12:00+0300\n"
 "Last-Translator: Student <student@example.com>\n"
-"Language-Team: Russian\n"
 "Language: ru\n"
+"Language-Team: Russian\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Generated-By: Babel 2.17.0\n"
 
 # Локализация для команды locale
-msgid "Set up locale: {}"
-msgstr "Установлена локаль: {}"
+#~ msgid "Set up locale: {}"
+#~ msgstr "Установлена локаль: {}"
 
 # Локализация сообщений при атаке
-msgid "User '{0}' attacked '{1}' with {2}, dealing {3} HP. {1} has {4} HP left."
-msgstr "Пользователь '{0}' атаковал '{1}' оружием {2}, нанеся {3} очков здоровья. У {1} осталось {4} очков здоровья."
+#~ msgid ""
+#~ "User '{0}' attacked '{1}' with {2}, "
+#~ "dealing {3} HP. {1} has {4} HP "
+#~ "left."
+#~ msgstr ""
+#~ "Пользователь '{0}' атаковал '{1}' оружием "
+#~ "{2}, нанеся {3} очков здоровья. У "
+#~ "{1} осталось {4} очков здоровья."
 
-msgid "User '{0}' attacked '{1}' with {2}, dealing {3} HP. {1} was killed!"
-msgstr "Пользователь '{0}' атаковал '{1}' оружием {2}, нанеся {3} очков здоровья. {1} был убит!"
+#~ msgid "User '{0}' attacked '{1}' with {2}, dealing {3} HP. {1} was killed!"
+#~ msgstr ""
+#~ "Пользователь '{0}' атаковал '{1}' оружием "
+#~ "{2}, нанеся {3} очков здоровья. {1} "
+#~ "был убит!"
 
 # Множественное число для HP (очки здоровья)
-msgid "{} HP"
-msgid_plural "{} HP"
-msgstr[0] "{} очко здоровья"
-msgstr[1] "{} очка здоровья"
-msgstr[2] "{} очков здоровья"
+#~ msgid "{} HP"
+#~ msgid_plural "{} HP"
+#~ msgstr[0] "{} очко здоровья"
+#~ msgstr[1] "{} очка здоровья"
+#~ msgstr[2] "{} очков здоровья"
 
 # Локализация для добавления монстра
-msgid "User '{0}' added monster '{1}' with {2} HP at ({3}, {4})"
-msgstr "Пользователь '{0}' добавил монстра '{1}' с {2} очками здоровья в позиции ({3}, {4})"
+#~ msgid "User '{0}' added monster '{1}' with {2} HP at ({3}, {4})"
+#~ msgstr ""
+#~ "Пользователь '{0}' добавил монстра '{1}' "
+#~ "с {2} очками здоровья в позиции "
+#~ "({3}, {4})"
 
 # Локализация для подключения и отключения пользователей
-msgid "User '{0}' has joined the MUD."
-msgstr "Пользователь '{0}' присоединился к MUD."
+#~ msgid "User '{0}' has joined the MUD."
+#~ msgstr "Пользователь '{0}' присоединился к MUD."
 
-msgid "User '{0}' has left the MUD."
-msgstr "Пользователь '{0}' покинул MUD."
+#~ msgid "User '{0}' has left the MUD."
+#~ msgstr "Пользователь '{0}' покинул MUD."
 
 # Локализация для команды movemonsters
-msgid "Moving monsters: on"
-msgstr "Передвижение монстров: включено"
+#~ msgid "Moving monsters: on"
+#~ msgstr "Передвижение монстров: включено"
 
-msgid "Moving monsters: off"
-msgstr "Передвижение монстров: выключено"
+#~ msgid "Moving monsters: off"
+#~ msgstr "Передвижение монстров: выключено"
 
-msgid "User '{0}' turned monster movement ON"
-msgstr "Пользователь '{0}' включил передвижение монстров"
+#~ msgid "User '{0}' turned monster movement ON"
+#~ msgstr "Пользователь '{0}' включил передвижение монстров"
 
-msgid "User '{0}' turned monster movement OFF"
-msgstr "Пользователь '{0}' выключил передвижение монстров"
+#~ msgid "User '{0}' turned monster movement OFF"
+#~ msgstr "Пользователь '{0}' выключил передвижение монстров"
+

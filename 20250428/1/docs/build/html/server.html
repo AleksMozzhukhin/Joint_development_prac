@@ -46,8 +46,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Серверный модуль</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mood.server.game_server.broadcast_message"><code class="docutils literal notranslate"><span class="pre">broadcast_message()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mood.server.game_server.move_monsters"><code class="docutils literal notranslate"><span class="pre">move_monsters()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.game_server.get_translator"><code class="docutils literal notranslate"><span class="pre">get_translator()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mood.server.game_server.MUDGame"><code class="docutils literal notranslate"><span class="pre">MUDGame</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mood.server.game_server.MUDGame.handle_command"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_command()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.server.game_server.MUDGame.handle_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_movemonsters()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mood.server.game_server.MUDGame.handle_sayall"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_sayall()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mood.server.game_server.MUDGame.handle_move"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_move()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mood.server.game_server.MUDGame.handle_addmon"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_addmon()</span></code></a></li>
@@ -95,8 +97,8 @@
 <dt class="sig sig-object py" id="mood.server.game_server.broadcast_message">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.game_server.</span></span><span class="sig-name descname"><span class="pre">broadcast_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#broadcast_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.broadcast_message" title="Link to this definition"></a></dt>
 <dd><p>Отправить сообщение всем подключенным клиентам, кроме исключенного.</p>
-<p>Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение.
-Если при отправке возникает ошибка, клиент помечается для удаления.</p>
+<p>Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение
+с учетом локали каждого клиента.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -117,6 +119,23 @@
 и направление, пока не найдет свободную клетку.
 При успешном перемещении всем игрокам отправляется сообщение о движении монстра.
 Если на новой позиции находятся игроки, инициируется “энкаунтер”.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.game_server.get_translator">
+<span class="sig-prename descclassname"><span class="pre">mood.server.game_server.</span></span><span class="sig-name descname"><span class="pre">get_translator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#get_translator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.get_translator" title="Link to this definition"></a></dt>
+<dd><p>Получить объект перевода для указанной локали.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>locale</strong> – Имя локали.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Объект для перевода строк.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>gettext.NullTranslations or gettext.GNUTranslations</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -142,6 +161,12 @@
 <dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.game_server.MUDGame.handle_movemonsters">
+<span class="sig-name descname"><span class="pre">handle_movemonsters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#MUDGame.handle_movemonsters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.MUDGame.handle_movemonsters" title="Link to this definition"></a></dt>
+<dd><p>Обработать команду включения/выключения режима бродячих монстров.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -184,37 +209,12 @@
 <dt class="sig sig-object py" id="mood.server.game_server.MUDGame.handle_addmon">
 <span class="sig-name descname"><span class="pre">handle_addmon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#MUDGame.handle_addmon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.MUDGame.handle_addmon" title="Link to this definition"></a></dt>
 <dd><p>Обработать команду добавления монстра.</p>
-<p>Добавляет нового монстра на указанную позицию на карте.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>args</strong> – Аргументы команды addmon.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Пара (ответ клиенту, широковещательное сообщение).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mood.server.game_server.MUDGame.handle_attack">
 <span class="sig-name descname"><span class="pre">handle_attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#MUDGame.handle_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.MUDGame.handle_attack" title="Link to this definition"></a></dt>
 <dd><p>Обработать команду атаки монстра.</p>
-<p>Атакует монстра на текущей позиции игрока с указанным уроном.
-Если урон достаточен для убийства монстра, монстр удаляется с карты.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>args</strong> – Аргументы команды attack.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Пара (ответ клиенту, широковещательное сообщение).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -237,16 +237,6 @@
 <dt class="sig sig-object py" id="mood.server.game_server.handle_client">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.game_server.</span></span><span class="sig-name descname"><span class="pre">handle_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/game_server.html#handle_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.server.game_server.handle_client" title="Link to this definition"></a></dt>
 <dd><p>Обработать соединение с клиентом.</p>
-<p>Эта асинхронная функция обрабатывает подключение нового клиента.
-Она выполняет процедуру входа и затем обрабатывает команды от клиента.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>reader</strong> – Объект для чтения данных от клиента.</p></li>
-<li><p><strong>writer</strong> – Объект для отправки данных клиенту.</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py function">

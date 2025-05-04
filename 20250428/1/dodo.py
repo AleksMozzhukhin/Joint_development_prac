@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from doit.tools import create_folder, run_once
+from doit.tools import create_folder, run_once, CmdAction
 
 PROJECT_ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -11,6 +11,14 @@ POT_FILE = LOCALE_DIR / "messages.pot"
 PO_FILE_RU = LOCALE_DIR / "ru" / "LC_MESSAGES" / "messages.po"
 MO_FILE_RU = LOCALE_DIR / "ru" / "LC_MESSAGES" / "messages.mo"
 I18N_SOURCE_FILES = list(PROJECT_ROOT.glob("mood/server/**/*.py"))
+DOCS_DIR = PROJECT_ROOT / "docs"
+DOCS_SOURCE_DIR = DOCS_DIR / "source"
+DOCS_BUILD_DIR = DOCS_DIR / "build"
+TEST_FILES = list(PROJECT_ROOT.glob("tests/**/*.py"))
+SOURCE_FILES = list(PROJECT_ROOT.glob("mood/**/*.py"))
+
+DOIT_CONFIG = {'default_tasks': ['html']}
+
 
 def _clean_file(filepath):
     """Безопасно удаляет файл, если он существует."""
@@ -20,6 +28,16 @@ def _clean_file(filepath):
             print(f"Removed: {filepath}")
     except OSError as e:
         print(f"Error removing file {filepath}: {e}")
+
+
+def _clean_dir(dirpath):
+    """Безопасно удаляет каталог, если он существует."""
+    try:
+        dirpath_str = str(dirpath)
+        if os.path.isdir(dirpath_str):
+            shutil.rmtree(dirpath_str, ignore_errors=True)
+    except OSError as e:
+        print(f"Error removing directory {dirpath_str}: {e}")
 
 
 def task_pot():
@@ -59,6 +77,7 @@ def task_po():
         "doc": "Update .po translation file from .pot template.",
     }
 
+
 def task_mo():
     """
     Компилирует файлы переводов (.po) в бинарном формате (.mo).
@@ -74,6 +93,7 @@ def task_mo():
         "doc": "Compile .po file into .mo binary format.",
     }
 
+
 def task_i18n():
     """
     Запускает все шаги перевода: pot -> po -> mo.
@@ -88,6 +108,46 @@ def task_i18n():
             (_clean_file, [mo_file_path])
         ],
         "doc": "Generate all translation files (.pot, .po, .mo).",
+    }
+
+
+def task_html():
+    """
+    Генерация HTML документации с помощью Sphinx.
+    """
+    html_index_path = str(DOCS_BUILD_DIR / "html" / "index.html")
+    build_dir_path = str(DOCS_BUILD_DIR)
+    docs_dir_path = str(DOCS_DIR)
+
+    source_files = [str(p) for p in DOCS_SOURCE_DIR.glob("**/*") if p.is_file()]
+    mood_files = [str(p) for p in PROJECT_ROOT.glob("mood/**/*.py") if p.is_file()]
+
+    action = CmdAction("make html", cwd=docs_dir_path)
+
+    return {
+        "actions": [(create_folder, [DOCS_BUILD_DIR / "html"]), action],
+        "file_dep": source_files + mood_files,
+        "targets": [html_index_path],
+        "clean": [(_clean_dir, [build_dir_path])],
+        "doc": "Generate HTML documentation.",
+    }
+
+
+
+def task_test():
+    """
+    Запуск интеграционных тестов сервер-клиент.
+    """
+    test_paths = [str(p) for p in TEST_FILES]
+    source_paths = [str(p) for p in SOURCE_FILES]
+    mo_file_path = str(MO_FILE_RU)
+
+    return {
+        "actions": ["python -m unittest tests.test_server_commands"],
+        "file_dep": test_paths + source_paths + [mo_file_path],
+        "task_dep": ["i18n"],
+        "clean": True,
+        "doc": "Run integration tests.",
     }
 
 

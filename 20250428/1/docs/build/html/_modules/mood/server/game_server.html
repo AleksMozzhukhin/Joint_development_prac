@@ -78,12 +78,23 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gettext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">babel.support</span><span class="w"> </span><span class="kn">import</span> <span class="n">Translations</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
 
 <span class="n">games</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># экземпляры игр для разных пользователей</span>
 <span class="n">clients</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># соответствие writer -&gt; username</span>
 <span class="n">usernames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 <span class="n">global_monsters</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">moving_monsters_enabled</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># По умолчанию режим бродячих монстров включен</span>
+<span class="n">client_locales</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># соответствие writer -&gt; locale</span>
+
+<span class="n">locale_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;locale&#39;</span><span class="p">)</span>
+<span class="n">translations</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="n">gettext</span><span class="o">.</span><span class="n">NullTranslations</span><span class="p">(),</span>  <span class="c1"># Для английского используем исходные строки</span>
+    <span class="s1">&#39;ru_RU.UTF8&#39;</span><span class="p">:</span> <span class="n">gettext</span><span class="o">.</span><span class="n">translation</span><span class="p">(</span><span class="s1">&#39;messages&#39;</span><span class="p">,</span> <span class="n">locale_dir</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ru&#39;</span><span class="p">],</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="broadcast_message">
@@ -92,8 +103,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Отправить сообщение всем подключенным клиентам, кроме исключенного.</span>
 
-<span class="sd">    Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение.</span>
-<span class="sd">    Если при отправке возникает ошибка, клиент помечается для удаления.</span>
+<span class="sd">    Функция проходит по всем подключенным клиентам и отправляет им указанное сообщение</span>
+<span class="sd">    с учетом локали каждого клиента.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        message: Сообщение для отправки.</span>
@@ -104,7 +115,14 @@
     <span class="k">for</span> <span class="n">writer</span><span class="p">,</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">clients</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">writer</span> <span class="o">!=</span> <span class="n">exclude_writer</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="c1"># Получаем локаль клиента</span>
+                <span class="n">locale</span> <span class="o">=</span> <span class="n">client_locales</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">)</span>
+                <span class="n">translator</span> <span class="o">=</span> <span class="n">get_translator</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
+
+                <span class="c1"># Переводим сообщение</span>
+                <span class="n">translated_message</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">gettext</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">translated_message</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
                 <span class="k">await</span> <span class="n">writer</span><span class="o">.</span><span class="n">drain</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error broadcasting to </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -118,6 +136,8 @@
                 <span class="n">usernames</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">games</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">games</span><span class="p">[</span><span class="n">username</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">writer</span> <span class="ow">in</span> <span class="n">client_locales</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">client_locales</span><span class="p">[</span><span class="n">writer</span><span class="p">]</span>
             <span class="k">del</span> <span class="n">clients</span><span class="p">[</span><span class="n">writer</span><span class="p">]</span></div>
 
 
@@ -137,6 +157,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># Ждем 30 секунд</span>
+
+        <span class="c1"># Проверяем, включен ли режим бродячих монстров</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">moving_monsters_enabled</span><span class="p">:</span>
+            <span class="k">continue</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">global_monsters</span><span class="p">:</span>  <span class="c1"># Если нет монстров, пропускаем</span>
             <span class="k">continue</span>
@@ -199,6 +223,21 @@
 
 
 
+<div class="viewcode-block" id="get_translator">
+<a class="viewcode-back" href="../../../server.html#mood.server.game_server.get_translator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_translator</span><span class="p">(</span><span class="n">locale</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Получить объект перевода для указанной локали.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        locale: Имя локали.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gettext.NullTranslations or gettext.GNUTranslations: Объект для перевода строк.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">translations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">locale</span><span class="p">,</span> <span class="n">translations</span><span class="p">[</span><span class="s1">&#39;en&#39;</span><span class="p">])</span></div>
+
+
 <div class="viewcode-block" id="MUDGame">
 <a class="viewcode-back" href="../../../server.html#mood.server.game_server.MUDGame">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MUDGame</span><span class="p">:</span>
@@ -254,8 +293,34 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_get_weapons</span><span class="p">(),</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">CMD_SAYALL</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_sayall</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">CMD_MOVEMONSTERS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_movemonsters</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">elif</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">CMD_LOCALE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Locale command cannot be processed here&quot;</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Unknown command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MUDGame.handle_movemonsters">
+<a class="viewcode-back" href="../../../server.html#mood.server.game_server.MUDGame.handle_movemonsters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_movemonsters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Обработать команду включения/выключения режима бродячих монстров.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">moving_monsters_enabled</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Invalid parameters. Use &#39;on&#39; or &#39;off&#39;&quot;</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">moving_monsters_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="s2">&quot;Moving monsters: on&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; turned monster movement ON&quot;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">moving_monsters_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="s2">&quot;Moving monsters: off&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; turned monster movement OFF&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Invalid parameter. Use &#39;on&#39; or &#39;off&#39;&quot;</span><span class="p">,</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="MUDGame.handle_sayall">
@@ -322,14 +387,6 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">handle_addmon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Обработать команду добавления монстра.</span>
-
-<span class="sd">        Добавляет нового монстра на указанную позицию на карте.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            args: Аргументы команды addmon.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple: Пара (ответ клиенту, широковещательное сообщение).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Invalid addmon parameters&quot;</span><span class="p">,</span> <span class="kc">None</span>
@@ -353,6 +410,7 @@
 
             <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ADDED</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">monster_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hello_string</span><span class="si">}</span><span class="s2">&quot;</span>
 
+            <span class="c1"># Сообщение для локализации</span>
             <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; added monster &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">monster_name</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">hitpoints</span><span class="si">}</span><span class="s2"> HP at (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span>
@@ -362,7 +420,6 @@
                 <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot; (replaced old monster)&quot;</span>
 
             <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">broadcast_msg</span>
-
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Invalid addmon parameters&quot;</span><span class="p">,</span> <span class="kc">None</span></div>
 
@@ -372,15 +429,6 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">handle_attack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Обработать команду атаки монстра.</span>
-
-<span class="sd">        Атакует монстра на текущей позиции игрока с указанным уроном.</span>
-<span class="sd">        Если урон достаточен для убийства монстра, монстр удаляется с карты.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            args: Аргументы команды attack.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple: Пара (ответ клиенту, широковещательное сообщение).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ERROR</span><span class="si">}</span><span class="s2">: Invalid attack parameters&quot;</span><span class="p">,</span> <span class="kc">None</span>
@@ -407,14 +455,14 @@
                     <span class="n">weapon_name</span> <span class="o">=</span> <span class="n">w_name</span>
                     <span class="k">break</span>
 
-            <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; attacked &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">weapon_name</span><span class="si">}</span><span class="s2">, dealing </span><span class="si">{</span><span class="n">actual_damage</span><span class="si">}</span><span class="s2"> damage.&quot;</span>
-            <span class="p">)</span>
-
+            <span class="c1"># Сообщения для локализации с поддержкой множественного числа для HP</span>
             <span class="k">if</span> <span class="n">monster_hp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">global_monsters</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
-                <span class="n">broadcast_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> was killed!&quot;</span>
+                <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; attacked &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">weapon_name</span><span class="si">}</span><span class="s2">, dealing </span><span class="si">{</span><span class="n">actual_damage</span><span class="si">}</span><span class="s2"> HP. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> was killed!&quot;</span>
+                <span class="p">)</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ATTACK</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">actual_damage</span><span class="si">}</span><span class="s2"> 0 &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_KILLED</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -423,7 +471,11 @@
                 <span class="n">global_monsters</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">current_monster_name</span><span class="p">,</span> <span class="n">monster_hello</span><span class="p">,</span> <span class="n">monster_hp</span>
                 <span class="p">)</span>
-                <span class="n">broadcast_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">monster_hp</span><span class="si">}</span><span class="s2"> HP left.&quot;</span>
+                <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_BROADCAST</span><span class="si">}</span><span class="s2">: User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; attacked &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">weapon_name</span><span class="si">}</span><span class="s2">, dealing </span><span class="si">{</span><span class="n">actual_damage</span><span class="si">}</span><span class="s2"> HP. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">monster_hp</span><span class="si">}</span><span class="s2"> HP left.&quot;</span>
+                <span class="p">)</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_ATTACK</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current_monster_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">actual_damage</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">monster_hp</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">broadcast_msg</span>
@@ -451,19 +503,14 @@
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_client</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">writer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Обработать соединение с клиентом.</span>
-
-<span class="sd">    Эта асинхронная функция обрабатывает подключение нового клиента.</span>
-<span class="sd">    Она выполняет процедуру входа и затем обрабатывает команды от клиента.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        reader: Объект для чтения данных от клиента.</span>
-<span class="sd">        writer: Объект для отправки данных клиенту.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">client_addr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">writer</span><span class="o">.</span><span class="n">get_extra_info</span><span class="p">(</span><span class="s1">&#39;peername&#39;</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection attempt: </span><span class="si">{</span><span class="n">client_addr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">username</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Установка локали по умолчанию для нового клиента</span>
+        <span class="n">client_locales</span><span class="p">[</span><span class="n">writer</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">reader</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -529,10 +576,32 @@
                 <span class="p">)</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">RESP_WEAPONS</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weapons_list</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
                 <span class="k">await</span> <span class="n">writer</span><span class="o">.</span><span class="n">drain</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">CMD_LOCALE</span><span class="p">):</span>
+                <span class="c1"># Обработка команды locale</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">locale_name</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="c1"># Проверяем, поддерживается ли локаль</span>
+                    <span class="k">if</span> <span class="n">locale_name</span> <span class="ow">in</span> <span class="n">translations</span><span class="p">:</span>
+                        <span class="n">client_locales</span><span class="p">[</span><span class="n">writer</span><span class="p">]</span> <span class="o">=</span> <span class="n">locale_name</span>
+                        <span class="c1"># Переводим сообщение ответа с учетом локали</span>
+                        <span class="n">translator</span> <span class="o">=</span> <span class="n">get_translator</span><span class="p">(</span><span class="n">locale_name</span><span class="p">)</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">gettext</span><span class="p">(</span><span class="s2">&quot;Set up locale: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">locale_name</span><span class="p">)</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported locale: </span><span class="si">{</span><span class="n">locale_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                    <span class="k">await</span> <span class="n">writer</span><span class="o">.</span><span class="n">drain</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Invalid locale format</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                    <span class="k">await</span> <span class="n">writer</span><span class="o">.</span><span class="n">drain</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">response</span><span class="p">,</span> <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="n">games</span><span class="p">[</span><span class="n">username</span><span class="p">]</span><span class="o">.</span><span class="n">handle_command</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                <span class="c1"># Переводим ответ с учетом локали клиента</span>
+                <span class="n">locale</span> <span class="o">=</span> <span class="n">client_locales</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">)</span>
+                <span class="n">translator</span> <span class="o">=</span> <span class="n">get_translator</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
+                <span class="n">translated_response</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">gettext</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
-                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">translated_response</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
                 <span class="k">await</span> <span class="n">writer</span><span class="o">.</span><span class="n">drain</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">broadcast_msg</span><span class="p">:</span>

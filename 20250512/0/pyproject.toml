@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "python-cowsay", "flake8", "requests", "sphinx", ]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +11,11 @@ version = "0.1.0"
 description = "A text-based adventure game server and client (MOOD)."
 #readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+    "python-cowsay",
+    "requests",
+    "babel"
+]
 
 [tool.setuptools]
 packages = ["mood", "mood.client", "mood.common", "mood.server", "mood.server.locale", "mood.server.locale.ru", "mood.server.locale.ru.LC_MESSAGES"]

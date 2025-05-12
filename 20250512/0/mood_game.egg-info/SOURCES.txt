@@ -14,5 +14,6 @@ mood/server/locale/ru/LC_MESSAGES/messages.po
 mood_game.egg-info/PKG-INFO
 mood_game.egg-info/SOURCES.txt
 mood_game.egg-info/dependency_links.txt
+mood_game.egg-info/requires.txt
 mood_game.egg-info/top_level.txt
 tests/test_server_commands.py

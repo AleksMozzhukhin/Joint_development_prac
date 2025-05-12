@@ -1,0 +1,3 @@
+[console_scripts]
+cowsay = cowsay:__main__.cowsay
+cowthink = cowsay:__main__.cowthink

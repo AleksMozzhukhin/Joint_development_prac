@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "python-cowsay", "flake8", "requests", "sphinx", ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mood-game"
+version = "0.1.0"
+description = "A text-based adventure game server and client (MOOD)."
+#readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.setuptools]
+packages = ["mood", "mood.client", "mood.common", "mood.server", "mood.server.locale", "mood.server.locale.ru", "mood.server.locale.ru.LC_MESSAGES"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"mood.server.locale" = [
+    "babel.cfg",
+    "ru/LC_MESSAGES/*.po",
+    "ru/LC_MESSAGES/*.mo"
+]

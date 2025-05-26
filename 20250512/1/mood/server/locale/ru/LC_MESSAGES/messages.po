@@ -1,0 +1,111 @@
+
+msgid ""
+msgstr ""
+"Project-Id-Version: mood 0.2.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-04-20 12:00+0300\n"
+"PO-Revision-Date: 2025-04-20 12:00+0300\n"
+"Last-Translator: Student <student@example.com>\n"
+"Language: ru\n"
+"Language-Team: Russian\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+# Локализация для команды locale
+msgid "Set up locale: {}"
+msgstr "Установлена локаль: {}"
+
+# Локализация сообщений при атаке
+msgid ""
+"{const.RESP_BROADCAST}: User '{username}' attacked"
+" '{monster}' with {weapon}, dealing "
+"{damage} HP. {monster} has {hp} HP "
+"left."
+msgstr ""
+"{const.RESP_BROADCAST}: Пользователь '{username}' "
+"атаковал '{monster}' оружием {weapon}, нанеся"
+" {damage} очков здоровья. У {monster} "
+"осталось {hp} очков здоровья."
+
+msgid ""
+"{const.RESP_BROADCAST}: User '{username}' attacked"
+" '{monster}' with {weapon}, dealing "
+"{damage} HP. {monster} was killed!"
+msgstr ""
+"{const.RESP_BROADCAST}: Пользователь '{username}' "
+"атаковал '{monster}' оружием {weapon}, нанеся"
+" {damage} очков здоровья. {monster} был "
+"убит!"
+
+# Локализация для добавления монстра
+msgid ""
+"{const.RESP_BROADCAST}: User '{username}' added "
+"monster '{monster}' with {hp} HP at "
+"({x}, {y})"
+msgstr ""
+"{const.RESP_BROADCAST}: Пользователь '{username}' "
+"добавил монстра '{monster}' с {hp} "
+"очками здоровья в позиции ({x}, {y})"
+
+# Локализация для подключения и отключения пользователей
+msgid "{const.RESP_BROADCAST}: User '{username}' has joined the MUD."
+msgstr "{const.RESP_BROADCAST}: Пользователь '{username}' присоединился к MUD."
+
+msgid "{const.RESP_BROADCAST}: User '{username}' has left the MUD."
+msgstr "{const.RESP_BROADCAST}: Пользователь '{username}' покинул MUD."
+
+# Локализация для команды movemonsters
+msgid "Moving monsters: on"
+msgstr "Передвижение монстров: включено"
+
+msgid "Moving monsters: off"
+msgstr "Передвижение монстров: выключено"
+
+msgid "{const.RESP_BROADCAST}: User '{username}' turned monster movement ON"
+msgstr ""
+"{const.RESP_BROADCAST}: Пользователь '{username}' "
+"включил передвижение монстров"
+
+msgid "{const.RESP_BROADCAST}: User '{username}' turned monster movement OFF"
+msgstr ""
+"{const.RESP_BROADCAST}: Пользователь '{username}' "
+"выключил передвижение монстров"
+
+# Локализация для движения монстров
+msgid "{const.RESP_BROADCAST}: {monster} moved one cell {direction}"
+msgstr ""
+"{const.RESP_BROADCAST}: {monster} переместился на"
+" одну клетку {direction}"
+
+# Локализация для sayall
+msgid "{const.RESP_BROADCAST}: {username}: {message}"
+msgstr "{const.RESP_BROADCAST}: {username}: {message}"
+
+# Локализация направлений
+msgid "right"
+msgstr "вправо"
+
+msgid "left"
+msgstr "влево"
+
+msgid "up"
+msgstr "вверх"
+
+msgid "down"
+msgstr "вниз"
+
+# Локализация для движения игрока
+msgid "Moved to ({x}, {y})"
+msgstr "Переход в ({x}, {y})"
+
+# Общие сообщения
+msgid "Unsupported locale: {}"
+msgstr "Неподдерживаемая локаль: {}"
+
+msgid "Invalid locale format"
+msgstr "Неверный формат локали"
+

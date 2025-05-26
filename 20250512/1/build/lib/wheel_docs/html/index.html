@@ -1,0 +1,343 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Документация игры MOOD &mdash; документация MOOD 0.2.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fd8abe03"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=cd1d70c9"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="Серверный модуль" href="server.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            MOOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <p class="caption" role="heading"><span class="caption-text">API документация:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Серверный модуль</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.html#id2">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#module-mood.server.game_server">Основной модуль сервера</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.broadcast_message"><code class="docutils literal notranslate"><span class="pre">broadcast_message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.move_monsters"><code class="docutils literal notranslate"><span class="pre">move_monsters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.get_translator"><code class="docutils literal notranslate"><span class="pre">get_translator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame"><code class="docutils literal notranslate"><span class="pre">MUDGame</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.__init__"><code class="docutils literal notranslate"><span class="pre">MUDGame.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_command"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_movemonsters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_sayall"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_sayall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_move"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_move()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_addmon"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_addmon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_attack"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_attack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame.handle_get_weapons"><code class="docutils literal notranslate"><span class="pre">MUDGame.handle_get_weapons()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.handle_client"><code class="docutils literal notranslate"><span class="pre">handle_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.start_server"><code class="docutils literal notranslate"><span class="pre">start_server()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.run_server"><code class="docutils literal notranslate"><span class="pre">run_server()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#module-mood.server.__main__">Основной модуль сервера (__main__)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.__main__.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Клиентский модуль</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#id2">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#module-mood.client.game_client">Основной модуль клиента</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient"><code class="docutils literal notranslate"><span class="pre">MUDClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.prompt"><code class="docutils literal notranslate"><span class="pre">MUDClient.prompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.intro"><code class="docutils literal notranslate"><span class="pre">MUDClient.intro</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.__init__"><code class="docutils literal notranslate"><span class="pre">MUDClient.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.connect"><code class="docutils literal notranslate"><span class="pre">MUDClient.connect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.receive_messages"><code class="docutils literal notranslate"><span class="pre">MUDClient.receive_messages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.get_weapons"><code class="docutils literal notranslate"><span class="pre">MUDClient.get_weapons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.send_command"><code class="docutils literal notranslate"><span class="pre">MUDClient.send_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_movemonsters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.complete_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_movemonsters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_up"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_up()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_down"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_down()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_left"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_left()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_right"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_right()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_sayall"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_sayall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_addmon"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_addmon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.process_addmon"><code class="docutils literal notranslate"><span class="pre">MUDClient.process_addmon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_attack"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_attack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.complete_attack"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_attack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.handle_server_response"><code class="docutils literal notranslate"><span class="pre">MUDClient.handle_server_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.display_monster"><code class="docutils literal notranslate"><span class="pre">MUDClient.display_monster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_quit"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_quit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_exit"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_exit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.do_locale"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_locale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.complete_locale"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_locale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.execute_commands_from_file"><code class="docutils literal notranslate"><span class="pre">MUDClient.execute_commands_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient.cmdloop"><code class="docutils literal notranslate"><span class="pre">MUDClient.cmdloop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.game_client.start_client"><code class="docutils literal notranslate"><span class="pre">start_client()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#module-mood.client.__main__">Основной модуль клиента (__main__)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.__main__.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="common.html">Общие компоненты</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="common.html#module-mood.common.constants">Константы</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Руководства:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Установка и настройка</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id2">Требования</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id3">Зависимости</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pipenv">Установка через pipenv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pip">Установка через pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id4">Настройка локализации</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id5">Генерация документации</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id6">Структура проекта</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id7">Проверка установки</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Примеры использования</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id2">Запуск сервера</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id3">Базовый запуск</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id4">Запуск с настройками</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id5">Подключение клиентов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id6">Интерактивный режим</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id7">Выполнение команд из файла</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id8">Примеры команд</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id9">Движение по карте</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id10">Добавление монстров</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id11">Сражение с монстрами</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id12">Общение с игроками</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id13">Настройка системы</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id14">Файл команд</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id15">Режимы игры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id16">Одиночная игра</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id17">Многопользовательская игра</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#id18">Автоматизированная игра</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id19">Отладка и разработка</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id20">Полезные советы</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">MOOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Документация игры MOOD</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mood">
+<h1>Документация игры MOOD<a class="headerlink" href="#mood" title="Ссылка на этот заголовок"></a></h1>
+<p>MOOD (MUD with cowsay) - многопользовательская текстовая игра.</p>
+<section id="id1">
+<h2>Введение<a class="headerlink" href="#id1" title="Ссылка на этот заголовок"></a></h2>
+<p>MOOD — это многопользовательская текстовая игра (MUD) с интеграцией cowsay для отображения монстров.
+Игра поддерживает множественных игроков, перемещение по игровому полю, сражения с монстрами и
+интерактивное общение между игроками.</p>
+</section>
+<section id="id2">
+<h2>Особенности<a class="headerlink" href="#id2" title="Ссылка на этот заголовок"></a></h2>
+<ul class="simple">
+<li><p><strong>Многопользовательский режим</strong> - одновременная игра нескольких игроков</p></li>
+<li><p><strong>Система монстров</strong> - добавление и сражение с различными существами</p></li>
+<li><p><strong>Бродячие монстры</strong> - автоматическое перемещение монстров каждые 30 секунд</p></li>
+<li><p><strong>Интеграция с cowsay</strong> - красивое отображение монстров в ASCII-арт</p></li>
+<li><p><strong>Локализация</strong> - поддержка русского и английского языков</p></li>
+<li><p><strong>Система оружия</strong> - различные виды оружия с разным уроном</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>Архитектура<a class="headerlink" href="#id3" title="Ссылка на этот заголовок"></a></h2>
+<p>Проект состоит из трех основных модулей:</p>
+<ul class="simple">
+<li><p><strong>Серверный модуль</strong> (<cite>mood.server</cite>) - обработка подключений, игровая логика</p></li>
+<li><p><strong>Клиентский модуль</strong> (<cite>mood.client</cite>) - пользовательский интерфейс и взаимодействие с сервером</p></li>
+<li><p><strong>Общие компоненты</strong> (<cite>mood.common</cite>) - константы и общие утилиты</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>Быстрый старт<a class="headerlink" href="#id4" title="Ссылка на этот заголовок"></a></h2>
+<p>Для запуска сервера:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>mood.server<span class="w"> </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">65432</span>
+</pre></div>
+</div>
+<p>Для подключения клиента:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>mood.client<span class="w"> </span>--host<span class="w"> </span>localhost<span class="w"> </span>--port<span class="w"> </span><span class="m">65432</span><span class="w"> </span>--username<span class="w"> </span>player1
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h2>Содержание документации<a class="headerlink" href="#id5" title="Ссылка на этот заголовок"></a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">API документация:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Серверный модуль</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.html#id2">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#module-mood.server.game_server">Основной модуль сервера</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.broadcast_message"><code class="docutils literal notranslate"><span class="pre">broadcast_message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.move_monsters"><code class="docutils literal notranslate"><span class="pre">move_monsters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.get_translator"><code class="docutils literal notranslate"><span class="pre">get_translator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.MUDGame"><code class="docutils literal notranslate"><span class="pre">MUDGame</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.handle_client"><code class="docutils literal notranslate"><span class="pre">handle_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.start_server"><code class="docutils literal notranslate"><span class="pre">start_server()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.game_server.run_server"><code class="docutils literal notranslate"><span class="pre">run_server()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server.html#module-mood.server.__main__">Основной модуль сервера (__main__)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.__main__.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="server.html#mood.server.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Клиентский модуль</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#id2">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#module-mood.client.game_client">Основной модуль клиента</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.game_client.MUDClient"><code class="docutils literal notranslate"><span class="pre">MUDClient</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.game_client.start_client"><code class="docutils literal notranslate"><span class="pre">start_client()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#module-mood.client.__main__">Основной модуль клиента (__main__)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.__main__.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="client.html#mood.client.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="common.html">Общие компоненты</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="common.html#module-mood.common.constants">Константы</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Руководства:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Установка и настройка</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id2">Требования</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id3">Зависимости</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pipenv">Установка через pipenv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pip">Установка через pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id4">Настройка локализации</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id5">Генерация документации</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id6">Структура проекта</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id7">Проверка установки</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Примеры использования</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id2">Запуск сервера</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id5">Подключение клиентов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id8">Примеры команд</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id14">Файл команд</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id15">Режимы игры</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id19">Отладка и разработка</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id20">Полезные советы</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="id6">
+<h1>Индексы и таблицы<a class="headerlink" href="#id6" title="Ссылка на этот заголовок"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Алфавитный указатель</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Состав модуля</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Поиск</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
+        <a href="server.html" class="btn btn-neutral float-right" title="Серверный модуль" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Авторские права 2025, Student. </p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

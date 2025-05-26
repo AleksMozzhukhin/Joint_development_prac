@@ -1,0 +1,3 @@
+[console_scripts]
+moodclient = mood.client:run
+moodserver = mood.server:run

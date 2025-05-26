@@ -1,0 +1,523 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Клиентский модуль &mdash; документация MOOD 0.2.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fd8abe03"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=cd1d70c9"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MOOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Клиентский модуль</a><ul>
+<li><a class="reference internal" href="#id2">Основные компоненты</a></li>
+<li><a class="reference internal" href="#module-mood.client.game_client">Основной модуль клиента</a><ul>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient"><code class="docutils literal notranslate"><span class="pre">MUDClient</span></code></a><ul>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.prompt"><code class="docutils literal notranslate"><span class="pre">MUDClient.prompt</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.intro"><code class="docutils literal notranslate"><span class="pre">MUDClient.intro</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.__init__"><code class="docutils literal notranslate"><span class="pre">MUDClient.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.connect"><code class="docutils literal notranslate"><span class="pre">MUDClient.connect()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.receive_messages"><code class="docutils literal notranslate"><span class="pre">MUDClient.receive_messages()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.get_weapons"><code class="docutils literal notranslate"><span class="pre">MUDClient.get_weapons()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.send_command"><code class="docutils literal notranslate"><span class="pre">MUDClient.send_command()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_movemonsters()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.complete_movemonsters"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_movemonsters()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_up"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_up()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_down"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_down()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_left"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_left()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_right"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_right()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_sayall"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_sayall()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_addmon"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_addmon()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.process_addmon"><code class="docutils literal notranslate"><span class="pre">MUDClient.process_addmon()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_attack"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_attack()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.complete_attack"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_attack()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.handle_server_response"><code class="docutils literal notranslate"><span class="pre">MUDClient.handle_server_response()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.display_monster"><code class="docutils literal notranslate"><span class="pre">MUDClient.display_monster()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_quit"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_quit()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_exit"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_exit()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.do_locale"><code class="docutils literal notranslate"><span class="pre">MUDClient.do_locale()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.complete_locale"><code class="docutils literal notranslate"><span class="pre">MUDClient.complete_locale()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.execute_commands_from_file"><code class="docutils literal notranslate"><span class="pre">MUDClient.execute_commands_from_file()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.game_client.MUDClient.cmdloop"><code class="docutils literal notranslate"><span class="pre">MUDClient.cmdloop()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mood.client.game_client.start_client"><code class="docutils literal notranslate"><span class="pre">start_client()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-mood.client.__main__">Основной модуль клиента (__main__)</a><ul>
+<li><a class="reference internal" href="#mood.client.__main__.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li><a class="reference internal" href="#mood.client.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MOOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Клиентский модуль</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/client.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>Клиентский модуль<a class="headerlink" href="#id1" title="Ссылка на этот заголовок"></a></h1>
+<p>Клиентский модуль содержит интерфейс командной строки для взаимодействия с сервером MOOD.
+Он предоставляет пользователю возможность подключаться к серверу, отправлять команды и получать ответы.</p>
+<section id="id2">
+<h2>Основные компоненты<a class="headerlink" href="#id2" title="Ссылка на этот заголовок"></a></h2>
+<ul class="simple">
+<li><p><strong>Игровой клиент</strong> (<cite>game_client.py</cite>) - основной класс клиента</p></li>
+<li><p><strong>Система команд</strong> - обработка пользовательских команд</p></li>
+<li><p><strong>Асинхронный ввод-вывод</strong> - обработка сообщений от сервера</p></li>
+</ul>
+</section>
+<section id="module-mood.client.game_client">
+<span id="id3"></span><h2>Основной модуль клиента<a class="headerlink" href="#module-mood.client.game_client" title="Ссылка на этот заголовок"></a></h2>
+<p>Модуль клиентской части игры MOOD.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.client.game_client.</span></span><span class="sig-name descname"><span class="pre">MUDClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65432</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">Cmd</span></code></p>
+<p>Класс клиента для игры MOOD.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&gt;</span> <span class="pre">'</span></em><a class="headerlink" href="#mood.client.game_client.MUDClient.prompt" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.intro">
+<span class="sig-name descname"><span class="pre">intro</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;&lt;&lt;</span> <span class="pre">Welcome</span> <span class="pre">to</span> <span class="pre">MOOD</span> <span class="pre">(MUD</span> <span class="pre">with</span> <span class="pre">cowsay)</span> <span class="pre">Client</span> <span class="pre">0.2.0</span> <span class="pre">&gt;&gt;&gt;'</span></em><a class="headerlink" href="#mood.client.game_client.MUDClient.intro" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65432</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.__init__"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.__init__" title="Ссылка на это определение"></a></dt>
+<dd><p>Инициализировать клиента.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> – Адрес сервера.</p></li>
+<li><p><strong>port</strong> – Порт сервера.</p></li>
+<li><p><strong>username</strong> – Имя пользователя.</p></li>
+<li><p><strong>command_file</strong> – Путь к файлу с командами для выполнения.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.connect"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.connect" title="Ссылка на это определение"></a></dt>
+<dd><p>Подключиться к серверу.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.receive_messages">
+<span class="sig-name descname"><span class="pre">receive_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.receive_messages"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.receive_messages" title="Ссылка на это определение"></a></dt>
+<dd><p>Асинхронно получать сообщения от сервера.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.get_weapons">
+<span class="sig-name descname"><span class="pre">get_weapons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.get_weapons"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.get_weapons" title="Ссылка на это определение"></a></dt>
+<dd><p>Получить список оружия от сервера.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.send_command">
+<span class="sig-name descname"><span class="pre">send_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.send_command"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.send_command" title="Ссылка на это определение"></a></dt>
+<dd><p>Отправить команду на сервер и получить ответ.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> – Команда для отправки.</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Ответ от сервера.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_movemonsters">
+<span class="sig-name descname"><span class="pre">do_movemonsters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_movemonsters"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_movemonsters" title="Ссылка на это определение"></a></dt>
+<dd><p>Включить или выключить режим бродячих монстров.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – «on» для включения или «off» для выключения.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.complete_movemonsters">
+<span class="sig-name descname"><span class="pre">complete_movemonsters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begidx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endidx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.complete_movemonsters"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.complete_movemonsters" title="Ссылка на это определение"></a></dt>
+<dd><p>Автодополнение для команды movemonsters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Текст для дополнения.</p></li>
+<li><p><strong>line</strong> – Полная строка.</p></li>
+<li><p><strong>begidx</strong> – Начальный индекс.</p></li>
+<li><p><strong>endidx</strong> – Конечный индекс.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Список вариантов автодополнения.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_up">
+<span class="sig-name descname"><span class="pre">do_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_up"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_up" title="Ссылка на это определение"></a></dt>
+<dd><p>Переместить игрока вверх на одну позицию.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_down">
+<span class="sig-name descname"><span class="pre">do_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_down"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_down" title="Ссылка на это определение"></a></dt>
+<dd><p>Переместить игрока вниз на одну позицию.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_left">
+<span class="sig-name descname"><span class="pre">do_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_left"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_left" title="Ссылка на это определение"></a></dt>
+<dd><p>Переместить игрока влево на одну позицию.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_right">
+<span class="sig-name descname"><span class="pre">do_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_right"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_right" title="Ссылка на это определение"></a></dt>
+<dd><p>Переместить игрока вправо на одну позицию.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_sayall">
+<span class="sig-name descname"><span class="pre">do_sayall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_sayall"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_sayall" title="Ссылка на это определение"></a></dt>
+<dd><p>Отправить сообщение всем игрокам.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Текст сообщения.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_addmon">
+<span class="sig-name descname"><span class="pre">do_addmon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_addmon"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_addmon" title="Ссылка на это определение"></a></dt>
+<dd><p>Добавить монстра на карту.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы в формате: name coords x y hp health hello «message».</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.process_addmon">
+<span class="sig-name descname"><span class="pre">process_addmon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.process_addmon"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.process_addmon" title="Ссылка на это определение"></a></dt>
+<dd><p>Обработать аргументы команды addmon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> – Список аргументов.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_attack">
+<span class="sig-name descname"><span class="pre">do_attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_attack"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_attack" title="Ссылка на это определение"></a></dt>
+<dd><p>Атаковать монстра.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы в формате: &lt;monster_name&gt; with &lt;weapon&gt;.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.complete_attack">
+<span class="sig-name descname"><span class="pre">complete_attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begidx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endidx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.complete_attack"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.complete_attack" title="Ссылка на это определение"></a></dt>
+<dd><p>Автодополнение для команды attack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Текст для дополнения.</p></li>
+<li><p><strong>line</strong> – Полная строка.</p></li>
+<li><p><strong>begidx</strong> – Начальный индекс.</p></li>
+<li><p><strong>endidx</strong> – Конечный индекс.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Список вариантов автодополнения.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.handle_server_response">
+<span class="sig-name descname"><span class="pre">handle_server_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.handle_server_response"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.handle_server_response" title="Ссылка на это определение"></a></dt>
+<dd><p>Обработать ответ от сервера.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> – Строка ответа от сервера.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.display_monster">
+<span class="sig-name descname"><span class="pre">display_monster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monster_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.display_monster"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.display_monster" title="Ссылка на это определение"></a></dt>
+<dd><p>Отобразить монстра с использованием cowsay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>monster_name</strong> – Имя монстра.</p></li>
+<li><p><strong>message</strong> – Сообщение от монстра.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_quit">
+<span class="sig-name descname"><span class="pre">do_quit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_quit"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_quit" title="Ссылка на это определение"></a></dt>
+<dd><p>Выйти из игры.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>True для выхода из цикла cmd.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_exit">
+<span class="sig-name descname"><span class="pre">do_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_exit"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_exit" title="Ссылка на это определение"></a></dt>
+<dd><p>Выйти из игры (синоним для quit).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Аргументы команды (не используются).</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>True для выхода из цикла cmd.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.do_locale">
+<span class="sig-name descname"><span class="pre">do_locale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.do_locale"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.do_locale" title="Ссылка на это определение"></a></dt>
+<dd><p>Установить локаль для клиента.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arg</strong> – Имя локали (например, «ru_RU.UTF8»).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.complete_locale">
+<span class="sig-name descname"><span class="pre">complete_locale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begidx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endidx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.complete_locale"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.complete_locale" title="Ссылка на это определение"></a></dt>
+<dd><p>Автодополнение для команды locale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Текст для дополнения.</p></li>
+<li><p><strong>line</strong> – Полная строка.</p></li>
+<li><p><strong>begidx</strong> – Начальный индекс.</p></li>
+<li><p><strong>endidx</strong> – Конечный индекс.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Список вариантов автодополнения.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.execute_commands_from_file">
+<span class="sig-name descname"><span class="pre">execute_commands_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.execute_commands_from_file"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.execute_commands_from_file" title="Ссылка на это определение"></a></dt>
+<dd><p>Выполнить команды из файла.</p>
+<p>Читает команды из указанного файла и выполняет их последовательно
+с задержкой не менее 1 секунды между командами.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.client.game_client.MUDClient.cmdloop">
+<span class="sig-name descname"><span class="pre">cmdloop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intro</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#MUDClient.cmdloop"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.MUDClient.cmdloop" title="Ссылка на это определение"></a></dt>
+<dd><p>Запустить основной цикл обработки команд.</p>
+<p>Переопределяет метод cmdloop из cmd.Cmd для поддержки выполнения команд из файла.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>intro</strong> – Вступительное сообщение.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.client.game_client.start_client">
+<span class="sig-prename descclassname"><span class="pre">mood.client.game_client.</span></span><span class="sig-name descname"><span class="pre">start_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65432</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/game_client.html#start_client"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.game_client.start_client" title="Ссылка на это определение"></a></dt>
+<dd><p>Запустить клиента MOOD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> – Адрес сервера.</p></li>
+<li><p><strong>port</strong> – Порт сервера.</p></li>
+<li><p><strong>username</strong> – Имя пользователя.</p></li>
+<li><p><strong>command_file</strong> – Путь к файлу с командами для выполнения.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mood.client.__main__">
+<span id="main"></span><h2>Основной модуль клиента (__main__)<a class="headerlink" href="#module-mood.client.__main__" title="Ссылка на этот заголовок"></a></h2>
+<p>Точка входа для запуска клиента MOOD.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.client.__main__.parse_args">
+<span class="sig-prename descclassname"><span class="pre">mood.client.__main__.</span></span><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/__main__.html#parse_args"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.__main__.parse_args" title="Ссылка на это определение"></a></dt>
+<dd><p>Разобрать аргументы командной строки.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Результат<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Аргументы командной строки.</p>
+</dd>
+<dt class="field-even">Тип результата<span class="colon">:</span></dt>
+<dd class="field-even"><p>argparse.Namespace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.client.__main__.main">
+<span class="sig-prename descclassname"><span class="pre">mood.client.__main__.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/client/__main__.html#main"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.client.__main__.main" title="Ссылка на это определение"></a></dt>
+<dd><p>Основная функция запуска клиента.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Авторские права 2025, Student. </p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
